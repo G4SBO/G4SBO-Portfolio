@@ -1764,10 +1764,10 @@ footer {
       setNow(sample[0], true, 52);
       renderRiver(sample.slice(1));
       renderClock(SAMPLE_HOURS, { total: 1284, top: 'Tame Impala', topPlays: 221 });
-      $('or-src').textContent = 'Sample list for now. Previews from Apple Music.';
+      $('or-src').textContent = 'Sample list for now. Hover a record to hear it.';
     }
     if (live) {
-      $('or-src').textContent = 'Live from my Last.fm. Previews from Apple Music.';
+      $('or-src').textContent = 'Live from my Spotify. Hover a record to hear it.';
       loadRecent().catch(startSample);
       loadMonth().catch(() => renderClock(SAMPLE_HOURS, { total: 1284, top: 'Tame Impala', topPlays: 221 }));
       setInterval(() => { if (!document.hidden) loadRecent().catch(() => {}); }, 30000);
