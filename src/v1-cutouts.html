@@ -1,0 +1,635 @@
+<title>Gabriel Ronceria</title>
+<meta name="description" content="Gabriel Ronceria builds apps for real work. CST student in British Columbia.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Newsreader:ital,opsz,wght@1,6..72,400&display=swap">
+<style>
+/* Layout: two-column hero (name left, draggable paper cut-outs right), then a quiet single column of work, about and contact. */
+:root {
+  --paper: #EEF0F3;
+  --ink: #1B1D3A;
+  --muted: #585C7C;
+  --line: #D3D7E2;
+  --cobalt: #2B3FD6;
+  --coral: #FF5C7A;
+  --sun: #FFC233;
+  --leaf: #14996A;
+  --lilac: #A994F2;
+  --blend: normal;
+  --grain: .07;
+
+  --font-display: "Bricolage Grotesque", "Avenir Next Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-note: "Newsreader", Georgia, "Times New Roman", serif;
+
+  --step--1: .875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.375rem;
+  --step-2: 1.875rem;
+  --step-hero: clamp(3.75rem, 11.5vw, 9.5rem);
+  --gutter: clamp(16px, 4vw, 48px);
+  --max: 1240px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15162C; --ink: #ECEDF6; --muted: #A2A5C3; --line: #2B2D4C;
+    --cobalt: #5B6DFF; --coral: #FF7896; --sun: #FFCB4D; --leaf: #2FC488; --lilac: #B7A6F7;
+    --blend: normal; --grain: .05; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15162C; --ink: #ECEDF6; --muted: #A2A5C3; --line: #2B2D4C;
+  --cobalt: #5B6DFF; --coral: #FF7896; --sun: #FFCB4D; --leaf: #2FC488; --lilac: #B7A6F7;
+  --blend: normal; --grain: .05; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  font-variation-settings: "opsz" 16;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+/* Paper grain over everything */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--grain);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  z-index: 10;
+}
+a { color: inherit; text-decoration-thickness: 1.5px; text-underline-offset: .2em; }
+a:hover { text-decoration-color: var(--coral); }
+:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 3px; border-radius: 4px; }
+
+.wrap {
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Top bar */
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding-block: 1.5rem;
+}
+.top .mark { font-weight: 650; text-decoration: none; }
+.top nav { display: flex; gap: clamp(1rem, 3vw, 2rem); }
+.top nav a { text-decoration: none; color: var(--muted); }
+.top nav a:hover { color: var(--ink); }
+
+/* Hero */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  align-items: end;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  padding-block: clamp(1rem, 4vw, 3rem) clamp(3rem, 8vw, 6rem);
+}
+.hero-text { display: grid; gap: 1.75rem; min-width: 0; }
+.name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--step-hero);
+  font-weight: 760;
+  font-variation-settings: "opsz" 96, "wdth" 75;
+  line-height: .84;
+  letter-spacing: -.025em;
+  text-wrap: balance;
+}
+.name span { display: block; }
+.intro {
+  margin: 0;
+  max-width: 34ch;
+  font-size: var(--step-1);
+  line-height: 1.4;
+  font-variation-settings: "opsz" 28;
+  text-wrap: pretty;
+}
+.play {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .75rem 1rem;
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+.btn {
+  font: inherit;
+  font-weight: 600;
+  color: var(--ink);
+  background: transparent;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  padding: .5rem 1.1rem;
+  cursor: pointer;
+  transition: background-color .15s, color .15s;
+}
+.btn:hover { background: var(--ink); color: var(--paper); }
+
+.art { margin: 0; min-width: 0; display: grid; gap: .5rem; }
+.art svg {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: 78vh;
+  aspect-ratio: 600 / 720;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.art figcaption {
+  font-family: var(--font-note);
+  font-style: italic;
+  font-size: var(--step--1);
+  color: var(--muted);
+  text-align: right;
+}
+.piece { cursor: grab; }
+.piece.lifted { cursor: grabbing; }
+.cut {
+  mix-blend-mode: var(--blend);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform .18s ease-out;
+}
+.piece.lifted .cut { transform: scale(1.06); }
+.cut.enter { animation: cut-in .7s cubic-bezier(.2, .9, .25, 1.15) backwards; animation-delay: calc(var(--i) * 75ms); }
+.cut.leave { animation: cut-out .28s ease-in forwards; }
+@keyframes cut-in { from { transform: scale(.2) rotate(-35deg); opacity: 0; } }
+@keyframes cut-out { to { transform: scale(.4) rotate(25deg); opacity: 0; } }
+
+/* Sections */
+section { padding-block: clamp(3rem, 7vw, 5.5rem); border-top: 1.5px solid var(--line); }
+.section-head {
+  margin: 0 0 2rem;
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 700;
+  font-variation-settings: "opsz" 48, "wdth" 85;
+  letter-spacing: -.01em;
+}
+
+/* Work list */
+.projects { list-style: none; margin: 0; padding: 0; }
+.project { border-bottom: 1.5px solid var(--line); }
+.project:first-child { border-top: 1.5px solid var(--line); }
+.project-head {
+  all: unset;
+  box-sizing: border-box;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1.25rem;
+  padding-block: 1.25rem;
+  cursor: pointer;
+}
+.project-head:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 2px; border-radius: 6px; }
+.emblem { width: 64px; height: 64px; display: block; transition: transform .45s cubic-bezier(.3, 1.4, .5, 1); }
+.emblem path { mix-blend-mode: var(--blend); }
+.project-head:hover .emblem { transform: rotate(-12deg) scale(1.06); }
+.project-head[aria-expanded="true"] .emblem { transform: rotate(90deg) scale(1.1); }
+.p-main { display: grid; gap: .15rem; min-width: 0; }
+.p-title {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 680;
+  font-variation-settings: "opsz" 32, "wdth" 90;
+  line-height: 1.15;
+}
+.p-sum { color: var(--muted); }
+.p-year { color: var(--muted); font-variant-numeric: tabular-nums; font-size: var(--step--1); }
+.project-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .35s ease;
+}
+.project-head[aria-expanded="true"] + .project-body { grid-template-rows: 1fr; }
+.project-body > div { overflow: hidden; min-height: 0; }
+.project-body .inner {
+  padding: 0 0 1.75rem calc(64px + 1.25rem);
+  display: grid;
+  gap: .9rem;
+  max-width: calc(64px + 1.25rem + 62ch);
+}
+.project-body p { margin: 0; }
+.project-body ul { margin: 0; padding-left: 1.1rem; display: grid; gap: .35rem; }
+.project-body li::marker { color: var(--coral); }
+.stack { color: var(--muted); font-size: var(--step--1); }
+
+/* About */
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: start;
+}
+.about-grid > div { display: grid; gap: 1.1rem; max-width: 60ch; }
+.about-grid p { margin: 0; }
+.now { margin: 0; display: grid; gap: 1rem; }
+.now div { display: grid; gap: .1rem; }
+.now dt { font-weight: 650; }
+.now dd { margin: 0; color: var(--muted); }
+
+/* Contact */
+.contact { display: grid; gap: 1.5rem; }
+.email {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 5.4vw, 4.25rem);
+  font-weight: 700;
+  font-variation-settings: "opsz" 72, "wdth" 75;
+  line-height: 1;
+  letter-spacing: -.015em;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+.email:hover { color: var(--cobalt); }
+.contact-row { display: flex; flex-wrap: wrap; gap: .75rem 1.25rem; align-items: center; }
+.copy-status { color: var(--muted); font-size: var(--step--1); min-height: 1.5em; }
+
+footer {
+  padding-block: 2rem 3rem;
+  color: var(--muted);
+  font-size: var(--step--1);
+  border-top: 1.5px solid var(--line);
+}
+
+@media (max-width: 820px) {
+  .hero { grid-template-columns: minmax(0, 1fr); align-items: start; }
+  .art { order: -1; }
+  .art svg { max-height: 58vh; margin-inline: auto; }
+  .about-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  .top nav { gap: .9rem; }
+  .project-head { grid-template-columns: 48px minmax(0, 1fr); gap: 1rem; }
+  .emblem { width: 48px; height: 48px; }
+  .p-year { display: none; }
+  .project-body .inner { padding-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .cut.enter, .cut.leave { animation: none; }
+  .cut, .emblem, .project-body, .btn { transition: none; }
+}
+</style>
+
+<div class="wrap">
+  <header class="top" id="top">
+    <a class="mark" href="#top">G. Ronceria</a>
+    <nav aria-label="Sections">
+      <a href="#work">Work</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div class="hero-text">
+        <h1 class="name"><span>Gabriel</span><span>Ronceria</span></h1>
+        <p class="intro">I build apps for real work: crews out in the field, people keeping track of their money, and whatever I'm learning that week.</p>
+        <div class="play">
+          <span id="hint">Drag the shapes around.</span>
+          <button class="btn" type="button" id="shuffle">Cut new shapes</button>
+        </div>
+      </div>
+      <figure class="art">
+        <svg id="canvas" viewBox="0 0 600 720" role="img" aria-label="A paper cut-out composition of colorful organic shapes. A new one is generated on every visit.">
+          <defs>
+            <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+              <feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="4" result="t"/>
+              <feDisplacementMap in="SourceGraphic" in2="t" scale="5"/>
+            </filter>
+          </defs>
+          <g id="layer" filter="url(#rough)"></g>
+        </svg>
+        <figcaption id="label">Cut-out no. 0000. Gouache on paper, cut by a random seed.</figcaption>
+      </figure>
+    </div>
+
+    <section id="work" aria-labelledby="work-h">
+      <h2 class="section-head" id="work-h">Work</h2>
+      <ul class="projects">
+        <li class="project">
+          <button class="project-head" type="button" aria-expanded="false" aria-controls="p-fleet">
+            <svg class="emblem" viewBox="-70 -70 140 140" aria-hidden="true" data-shape="frond" data-seed="11" data-color="leaf"></svg>
+            <span class="p-main">
+              <span class="p-title">Fleet Manager</span>
+              <span class="p-sum">A fleet and field app for a contracting company.</span>
+            </span>
+            <span class="p-year">2026</span>
+          </button>
+          <div class="project-body" id="p-fleet"><div><div class="inner">
+            <p>Crews start and end shifts, fill in inspections and log their hours from a phone. Managers see vehicles, maintenance, parts and payroll hours in one place.</p>
+            <ul>
+              <li>Works with no signal. Forms wait on the phone and send themselves once it reconnects.</li>
+              <li>Work zones drawn on an offline map of British Columbia.</li>
+              <li>Payroll hours with overtime rules set per person.</li>
+              <li>One codebase, with a separate install for each company.</li>
+            </ul>
+            <p class="stack">Next.js, React, Supabase, Tailwind, MapLibre</p>
+          </div></div></div>
+        </li>
+        <li class="project">
+          <button class="project-head" type="button" aria-expanded="false" aria-controls="p-budget">
+            <svg class="emblem" viewBox="-70 -70 140 140" aria-hidden="true" data-shape="blob" data-seed="5" data-color="sun"></svg>
+            <span class="p-main">
+              <span class="p-title">Budgeting App</span>
+              <span class="p-sum">A personal finance app for Android and iPhone.</span>
+            </span>
+            <span class="p-year">2026</span>
+          </button>
+          <div class="project-body" id="p-budget"><div><div class="inner">
+            <p>Budgets, accounts and savings goals that live on your phone. No sign-up, and it works offline.</p>
+            <ul>
+              <li>Several accounts in different currencies, with your own exchange rates.</li>
+              <li>Savings goals with progress you can see.</li>
+              <li>Recurring payments with reminders.</li>
+              <li>My first project on GitHub, built with branches and pull requests.</li>
+            </ul>
+            <p class="stack">Expo, React Native, TypeScript, SQLite</p>
+          </div></div></div>
+        </li>
+        <li class="project">
+          <button class="project-head" type="button" aria-expanded="false" aria-controls="p-site">
+            <svg class="emblem" viewBox="-70 -70 140 140" aria-hidden="true" data-shape="star" data-seed="3" data-color="cobalt"></svg>
+            <span class="p-main">
+              <span class="p-title">This site</span>
+              <span class="p-sum">A portfolio that makes a new piece of art on every visit.</span>
+            </span>
+            <span class="p-year">2026</span>
+          </button>
+          <div class="project-body" id="p-site"><div><div class="inner">
+            <p>The shapes up top borrow from the paper cut-outs Henri Matisse made late in his life. A random seed decides every shape, color and position, so no two visitors see the same one.</p>
+            <ul>
+              <li>Plain HTML, CSS and JavaScript. No framework, no build step.</li>
+              <li>Shapes are SVG paths drawn from code, with rough edges like cut paper.</li>
+              <li>Drag the pieces anywhere.</li>
+            </ul>
+            <p class="stack">HTML, CSS, JavaScript, SVG</p>
+          </div></div></div>
+        </li>
+      </ul>
+    </section>
+
+    <section id="about" aria-labelledby="about-h">
+      <h2 class="section-head" id="about-h">About</h2>
+      <div class="about-grid">
+        <div>
+          <p>I'm a Computer Systems Technology student in British Columbia. I started the program in September 2026, but I was already building before the first class.</p>
+          <p>I like software that holds up outside the office: on a job site, on an old phone, with one bar of signal. I care about the small stuff too, like a button that does what it says.</p>
+        </div>
+        <dl class="now">
+          <div><dt>Studying</dt><dd>COMP 1800, web fundamentals</dd></div>
+          <div><dt>Building</dt><dd>Fleet Manager</dd></div>
+          <div><dt>Open to</dt><dd>Freelance work and co-op roles</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section id="contact" aria-labelledby="contact-h">
+      <h2 class="section-head" id="contact-h">Say hi</h2>
+      <div class="contact">
+        <a class="email" id="email" href="mailto:ronceriagabriel1011@gmail.com">ronceriagabriel1011@gmail.com</a>
+        <div class="contact-row">
+          <button class="btn" type="button" id="copy">Copy email</button>
+          <a href="https://github.com/yo-gabriel-portfolio-here">GitHub</a>
+          <span class="copy-status" id="copy-status" aria-live="polite"></span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2026 Gabriel Ronceria. The shapes are different every time you load the page.</footer>
+</div>
+
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const COLORS = ['cobalt', 'coral', 'sun', 'leaf', 'lilac'];
+  const W = 600, H = 720;
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Small seeded random generator so a seed always draws the same composition
+  function mulberry32(a) {
+    return () => {
+      a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function makeRng(seed) {
+    const r = mulberry32(seed);
+    return {
+      range: (a, b) => a + (b - a) * r(),
+      int: (a, b) => Math.floor(a + (b - a + 1) * r()),
+      pick: arr => arr[Math.floor(r() * arr.length)],
+    };
+  }
+
+  const f = n => n.toFixed(1);
+  // Closed Catmull-Rom curve through points, as cubic Beziers
+  function smooth(pts) {
+    const n = pts.length;
+    let d = `M${f(pts[0][0])} ${f(pts[0][1])}`;
+    for (let i = 0; i < n; i++) {
+      const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+      d += `C${f(p1[0] + (p2[0] - p0[0]) / 6)} ${f(p1[1] + (p2[1] - p0[1]) / 6)} ` +
+           `${f(p2[0] - (p3[0] - p1[0]) / 6)} ${f(p2[1] - (p3[1] - p1[1]) / 6)} ${f(p2[0])} ${f(p2[1])}`;
+    }
+    return d + 'Z';
+  }
+
+  const SHAPES = {
+    blob(r, R) {
+      const n = r.int(5, 8), pts = [];
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * Math.PI * 2 + r.range(-.25, .25);
+        const rad = R * r.range(.62, 1);
+        pts.push([Math.cos(a) * rad, Math.sin(a) * rad]);
+      }
+      return smooth(pts);
+    },
+    star(r, R) {
+      const n = r.int(5, 9), inner = r.range(.38, .55), pts = [];
+      for (let i = 0; i < n * 2; i++) {
+        const a = (i / (n * 2)) * Math.PI * 2;
+        const rad = i % 2 ? R * inner * r.range(.85, 1.1) : R * r.range(.85, 1);
+        pts.push([Math.cos(a) * rad, Math.sin(a) * rad]);
+      }
+      return smooth(pts);
+    },
+    // The seaweed-like leaf Matisse kept coming back to
+    frond(r, R) {
+      const m = 22, k = r.range(2.5, 4.5), ph = r.range(0, Math.PI * 2), bend = r.range(-.25, .25);
+      const left = [], right = [];
+      for (let i = 0; i < m; i++) {
+        const t = i / (m - 1);
+        const y = -R + 2 * R * t;
+        const env = Math.pow(Math.sin(Math.PI * t), .7);
+        const cx = R * bend * Math.sin(Math.PI * t);
+        const lobe = off => .45 + .55 * (.5 + .5 * Math.cos(t * k * Math.PI * 2 + ph + off));
+        left.push([cx - R * .6 * env * lobe(0), y]);
+        right.push([cx + R * .6 * env * lobe(Math.PI), y]);
+      }
+      return smooth([...left, ...right.slice(1, -1).reverse()]);
+    },
+    crescent(r, R) {
+      const k = r.range(.55, .78);
+      return `M0 ${f(-R)}A${f(R)} ${f(R)} 0 1 0 0 ${f(R)}A${f(R * k)} ${f(R)} 0 1 1 0 ${f(-R)}Z`;
+    },
+    dot(r, R) {
+      return `M${f(-R)} 0A${f(R)} ${f(R)} 0 1 0 ${f(R)} 0A${f(R)} ${f(R)} 0 1 0 ${f(-R)} 0Z`;
+    },
+  };
+
+  function compose(seed) {
+    const r = makeRng(seed);
+    const plan = [
+      ['frond', r.range(220, 265), true],
+      [r.pick(['blob', 'blob', 'star']), r.range(120, 160)],
+      [r.pick(['star', 'blob', 'crescent']), r.range(90, 125)],
+      [r.pick(['crescent', 'blob']), r.range(70, 100)],
+      ['frond', r.range(95, 135)],
+      ['dot', r.range(40, 68)],
+      [r.pick(['star', 'dot', 'blob']), r.range(28, 50)],
+      ['dot', r.range(12, 22)],
+    ];
+    const offset = r.int(0, 4);
+    const placed = [];
+    return plan.map(([type, R, center], i) => {
+      // Try a few spots and keep the one with the most breathing room, so small pieces stay visible
+      let best = null;
+      for (let tries = 0; tries < (center ? 1 : 24); tries++) {
+        const x = center ? r.range(250, 350) : r.range(Math.max(60, R * .85), W - Math.max(60, R * .85));
+        const y = center ? r.range(330, 390) : r.range(Math.max(60, R * .85), H - Math.max(60, R * .85));
+        const room = Math.min(Infinity, ...placed.map(p => Math.hypot(p.x - x, p.y - y) - (p.R + R) * .55));
+        if (!best || room > best.room) best = { x, y, room };
+      }
+      placed.push({ x: best.x, y: best.y, R });
+      return {
+        type,
+        d: SHAPES[type](r, R),
+        color: COLORS[(offset + i * 2) % COLORS.length],
+        x: best.x,
+        y: best.y,
+        rot: r.range(-60, 60),
+      };
+    });
+  }
+
+  const svg = document.getElementById('canvas');
+  const layer = document.getElementById('layer');
+  const label = document.getElementById('label');
+  const hint = document.getElementById('hint');
+
+  const place = (g, it) => g.setAttribute('transform', `translate(${f(it.x)} ${f(it.y)}) rotate(${f(it.rot)})`);
+
+  function render(seed, animate) {
+    layer.replaceChildren();
+    compose(seed).forEach((it, i) => {
+      const g = document.createElementNS(NS, 'g');
+      g.setAttribute('class', 'piece');
+      g.__item = it;
+      place(g, it);
+      const p = document.createElementNS(NS, 'path');
+      p.setAttribute('d', it.d);
+      p.setAttribute('class', animate && !reduceMotion ? 'cut enter' : 'cut');
+      p.style.fill = `var(--${it.color})`;
+      p.style.setProperty('--i', i);
+      g.appendChild(p);
+      layer.appendChild(g);
+    });
+    label.textContent = `Cut-out no. ${String(seed % 10000).padStart(4, '0')}. Gouache on paper, cut by a random seed.`;
+  }
+
+  const newSeed = () => Math.floor(Math.random() * 1e9);
+  render(newSeed(), true);
+
+  let busy = false;
+  document.getElementById('shuffle').addEventListener('click', () => {
+    if (busy) return;
+    if (reduceMotion) { render(newSeed(), false); return; }
+    busy = true;
+    layer.querySelectorAll('.cut').forEach(p => { p.classList.remove('enter'); p.classList.add('leave'); });
+    setTimeout(() => { render(newSeed(), true); busy = false; }, 280);
+  });
+
+  // Drag pieces around like paper on a table
+  let drag = null;
+  function toSvg(e) {
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX; pt.y = e.clientY;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+  }
+  svg.addEventListener('pointerdown', e => {
+    const g = e.target.closest('.piece');
+    if (!g) return;
+    const it = g.__item, pt = toSvg(e);
+    drag = { g, it, dx: pt.x - it.x, dy: pt.y - it.y, id: e.pointerId };
+    layer.appendChild(g);
+    g.classList.add('lifted');
+    svg.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  svg.addEventListener('pointermove', e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const pt = toSvg(e);
+    drag.it.x = Math.min(W, Math.max(0, pt.x - drag.dx));
+    drag.it.y = Math.min(H, Math.max(0, pt.y - drag.dy));
+    place(drag.g, drag.it);
+  });
+  const drop = e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    drag.g.classList.remove('lifted');
+    drag = null;
+    hint.textContent = 'Nice. Want a fresh sheet?';
+  };
+  svg.addEventListener('pointerup', drop);
+  svg.addEventListener('pointercancel', drop);
+
+  // Project emblems use the same shape cutter with fixed seeds
+  document.querySelectorAll('.emblem').forEach(el => {
+    const r = makeRng(Number(el.dataset.seed));
+    const p = document.createElementNS(NS, 'path');
+    p.setAttribute('d', SHAPES[el.dataset.shape](r, 58));
+    p.style.fill = `var(--${el.dataset.color})`;
+    el.appendChild(p);
+  });
+
+  document.querySelectorAll('.project-head').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.setAttribute('aria-expanded', String(btn.getAttribute('aria-expanded') !== 'true'));
+    });
+  });
+
+  // Copy email
+  const status = document.getElementById('copy-status');
+  document.getElementById('copy').addEventListener('click', () => {
+    const text = document.getElementById('email').textContent.trim();
+    const done = msg => { status.textContent = msg; setTimeout(() => { status.textContent = ''; }, 2500); };
+    const fallback = () => {
+      const range = document.createRange();
+      range.selectNodeContents(document.getElementById('email'));
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+      done('Selected. Press Ctrl+C to copy.');
+    };
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => done('Copied'), fallback);
+    else fallback();
+  });
+})();
+</script>

@@ -1,0 +1,349 @@
+<title>Flashlight options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Newsreader:ital,opsz,wght@1,6..72,400&display=swap">
+<style>
+/* Layout: two full-height flashlight demos for the G4SBO "Find me" section. A dark layer of outlines, a colored layer revealed by a light that follows the cursor. Dark only. */
+:root {
+  --night: #0B0718;
+  --night-2: #151026;
+  --paper: #F1EEF8;
+  --muted: #A49DBF;
+  --line: #2A2340;
+  --ghost: rgba(241, 238, 248, .3);
+  --cobalt: #3D5BFF;
+  --coral: #FF4F7B;
+  --sun: #FFC53D;
+  --leaf: #22C389;
+  --lilac: #B79CFF;
+  --violet: #7C3AED;
+  --font-display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-note: "Newsreader", Georgia, serif;
+  --gutter: clamp(16px, 4vw, 56px);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--night); overflow-x: clip; }
+body { margin: 0; color: var(--paper); font-family: var(--font-body); font-size: 1.0625rem; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
+
+.intro { padding: clamp(3rem, 8vw, 6rem) var(--gutter) 2rem; max-width: 60rem; }
+.intro h1 { margin: 0; font-family: var(--font-display); font-size: clamp(2.5rem, 7vw, 5.5rem); font-weight: 800; font-variation-settings: "opsz" 96, "wdth" 75; line-height: .9; letter-spacing: -.02em; }
+.intro p { margin: 1rem 0 0; color: var(--muted); font-size: 1.25rem; max-width: 46ch; }
+.option { border-top: 1.5px solid var(--line); padding-block: clamp(2.5rem, 6vw, 4rem); }
+.cap { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem 1rem; padding: 0 var(--gutter) 1rem; }
+.cap b { font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 800; font-variation-settings: "opsz" 48, "wdth" 80; }
+.cap span { color: var(--muted); font-family: var(--font-note); font-style: italic; font-size: 1.125rem; }
+.say { min-height: 1.6em; margin: 1.25rem var(--gutter) 0; color: var(--muted); font-size: 1.25rem; }
+.say b { color: var(--paper); }
+
+/* Shared light: a colored glow under the light, and a mask on the lit layer */
+.dark-room { position: relative; }
+.dark-room::before {
+  content: "";
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle calc(var(--rad, 200px) * 2.2) at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--glow, var(--paper)) 16%, transparent), transparent 70%);
+  transition: background .3s;
+}
+.lit {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle var(--rad, 200px) at var(--mx, 50%) var(--my, 50%), #000 0 55%, transparent 100%);
+  mask-image: radial-gradient(circle var(--rad, 200px) at var(--mx, 50%) var(--my, 50%), #000 0 55%, transparent 100%);
+}
+@media (hover: hover) and (pointer: fine) { .dark-room, .dark-room * { cursor: none; } }
+
+/* ---------- A: cards in the dark ---------- */
+.table { height: clamp(540px, 78vh, 720px); overflow: hidden; }
+.deck { position: absolute; inset: 0; }
+.cd {
+  position: absolute;
+  width: var(--cw); aspect-ratio: .7;
+  margin-left: calc(var(--cw) / -2);
+  transform: rotate(var(--rot)) translateY(var(--lift, 0px));
+  transform-origin: 50% 100%;
+  transition: transform .5s cubic-bezier(.2, .9, .2, 1);
+  perspective: 900px;
+}
+.cd.hot, .cd.flipped { --lift: -42px; z-index: 5; }
+.cd-in { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .7s cubic-bezier(.3, 1.3, .5, 1); }
+.cd.flipped .cd-in { transform: rotateY(180deg); }
+.fc {
+  position: absolute; inset: 0;
+  border-radius: 16px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+.fc.front { display: grid; align-content: space-between; padding: .85rem; }
+.fc .idx { font-weight: 800; font-size: .95rem; line-height: 1; }
+.fc svg { position: absolute; left: 50%; top: 45%; width: 66%; height: 66%; transform: translate(-50%, -50%); }
+.fc.front b { position: relative; font-family: var(--font-display); font-size: calc(var(--cw) * .19); font-weight: 800; font-variation-settings: "opsz" 64, "wdth" 75; line-height: .9; }
+.fc.back { transform: rotateY(180deg); background: var(--night-2); border: 3px solid var(--c); display: grid; place-content: center; gap: .8rem; text-align: center; padding: .8rem; }
+.fc.back b { font-family: var(--font-display); font-size: calc(var(--cw) * .15); font-weight: 800; font-variation-settings: "opsz" 64, "wdth" 75; color: var(--c); line-height: 1; }
+.fc.back span { color: var(--muted); font-size: .8rem; overflow-wrap: anywhere; }
+.go {
+  justify-self: center;
+  display: inline-block;
+  border: 0; border-radius: 999px;
+  padding: .55rem 1rem;
+  background: var(--c); color: var(--fg);
+  font-weight: 750; font-size: .85rem;
+  text-decoration: none;
+}
+/* Dark copy: outlines only */
+.base .cd { cursor: pointer; }
+.base .fc.front { background: var(--night-2); border: 2px solid var(--ghost); color: transparent; transition: background-color .3s, border-color .3s, color .3s; }
+.base .fc.front b, .base .fc.front .idx { -webkit-text-stroke: 1.2px var(--ghost); transition: -webkit-text-stroke-color .3s; }
+.base .fc svg { fill: none; stroke: var(--ghost); stroke-width: .6; transition: fill .3s, stroke .3s; }
+.base .cd.hot .fc.front, .base .cd:focus-visible .fc.front { background: var(--c); border-color: var(--paper); color: var(--fg); }
+.base .cd.hot .fc.front b, .base .cd.hot .fc.front .idx { -webkit-text-stroke-color: transparent; }
+.base .cd.hot .fc svg { fill: var(--fg); stroke: transparent; }
+.base .cd:focus-visible { outline: none; }
+.base .cd:focus-visible .fc.front { box-shadow: 0 0 0 3px var(--sun); }
+/* Lit copy: full color */
+.lit .fc.front { background: var(--c); color: var(--fg); border: 2px solid var(--paper); }
+.lit .fc svg { fill: var(--fg); }
+
+/* ---------- B: hidden mural ---------- */
+.mural { padding: clamp(2rem, 6vw, 4rem) var(--gutter); overflow: hidden; }
+.mural .lit { inset: 0; }
+.mural-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.names {
+  position: relative;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 10.5vw, 10rem);
+  font-weight: 800;
+  font-variation-settings: "opsz" 96, "wdth" 75;
+  line-height: 1.02;
+  letter-spacing: -.02em;
+}
+.names a, .names button, .names > span {
+  display: inline;
+  font: inherit;
+  border: 0; padding: 0; background: none;
+  text-decoration: none;
+  margin-right: .2em;
+}
+.names .hd {
+  display: inline-block;
+  vertical-align: top;
+  margin: .55em 0 0 .12em;
+  font-family: var(--font-note);
+  font-style: italic;
+  font-weight: 400;
+  font-size: .18em;
+  letter-spacing: 0;
+  line-height: 1;
+}
+.mural .base .nm { color: transparent; -webkit-text-stroke: 1.5px var(--ghost); transition: color .25s, -webkit-text-stroke-color .25s; }
+.mural .base .hd { color: transparent; }
+.mural .base a:hover .nm, .mural .base button:hover .nm, .mural .base a:focus-visible .nm, .mural .base button:focus-visible .nm { color: var(--c); -webkit-text-stroke-color: var(--c); }
+.mural .base a:hover .hd, .mural .base button:hover .hd, .mural .base a:focus-visible .hd, .mural .base button:focus-visible .hd { color: var(--paper); }
+.mural .base a:focus-visible, .mural .base button:focus-visible { outline: none; }
+.mural .lit .names { padding: 0 var(--gutter); }
+.mural .lit .nm { color: var(--c); }
+.mural .lit .hd { color: var(--paper); }
+.mural-inner { position: absolute; inset: clamp(2rem, 6vw, 4rem) 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cd, .cd-in { transition: none; }
+}
+</style>
+
+<header class="intro">
+  <h1>Flashlight, two ways</h1>
+  <p>A combina la linterna con las cartas. B es otra linterna, con un mural escondido detrás de los nombres.</p>
+</header>
+
+<section class="option" aria-labelledby="a-h">
+  <div class="cap"><b id="a-h">A: Cartas en la oscuridad</b><span>Busca con la linterna. La carta iluminada se levanta; haz clic para voltearla.</span></div>
+  <div class="dark-room table" id="table">
+    <div class="deck base" id="deck-base"></div>
+    <div class="deck lit" id="deck-lit" aria-hidden="true"></div>
+  </div>
+  <p class="say" id="say-a">Search the dark for a card.</p>
+</section>
+
+<section class="option" aria-labelledby="b-h">
+  <div class="cap"><b id="b-h">B: Mural escondido</b><span>La luz revela un mural de recortes detrás de los nombres, y tus usuarios.</span></div>
+  <div class="dark-room mural" id="mural">
+    <div class="lit" id="mural-lit" aria-hidden="true">
+      <svg class="mural-art" id="mural-art" preserveAspectRatio="none"></svg>
+      <div class="mural-inner"><p class="names" id="names-lit"></p></div>
+    </div>
+    <p class="names base" id="names-base"></p>
+  </div>
+  <p class="say" id="say-b">Move the light over the wall.</p>
+</section>
+
+<script>
+(() => {
+  const LINKS = [
+    { name: 'GitHub', handle: 'yo-gabriel-portfolio-here', href: 'https://github.com/yo-gabriel-portfolio-here', c: 'cobalt', fg: 'paper', key: 'G' },
+    { name: 'Instagram', handle: '@_gasbo', href: 'https://instagram.com/_gasbo', c: 'coral', fg: 'night', key: 'I' },
+    { name: 'TikTok', handle: '@gabo2575', href: 'https://www.tiktok.com/@gabo2575', c: 'lilac', fg: 'night', key: 'T' },
+    { name: 'Spotify', handle: 'G4SBO', href: 'https://open.spotify.com/user/wazz1majwo2c3iwky0lexag2l', c: 'leaf', fg: 'night', key: 'S' },
+    { name: 'Snapchat', handle: 'Gabriel_R', href: 'https://www.snapchat.com/add/gabriel_r97106', c: 'sun', fg: 'night', key: 'C' },
+    { name: 'Discord', handle: 'G4SBX', copy: 'G4SBX', c: 'violet', fg: 'paper', key: 'D' },
+  ];
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const vars = l => `--c: var(--${l.c}); --fg: var(--${l.fg});`;
+  const tagOf = l => l.copy ? 'button' : 'a';
+  const attrs = l => l.copy ? 'type="button"' : `href="${l.href}" target="_blank" rel="noopener"`;
+  function copyTo(text, el, back) {
+    const done = msg => { el.textContent = msg; setTimeout(() => { el.textContent = back; }, 2000); };
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => done('Copied!'), () => done(text));
+    else done(text);
+  }
+
+  // A light that follows the pointer, and wanders on its own when idle
+  function flashlight(room, lit, { rad = 200, hotRad = 260 } = {}) {
+    let x = .5, y = .5, tx = .5, ty = .5, last = -1e9, r = rad, tr = rad;
+    room.addEventListener('pointermove', e => {
+      const b = room.getBoundingClientRect();
+      tx = (e.clientX - b.left) / b.width; ty = (e.clientY - b.top) / b.height;
+      last = performance.now();
+    });
+    const api = { hot(on, color) { tr = on ? hotRad : rad; room.style.setProperty('--glow', color || 'var(--paper)'); } };
+    (function loop(now) {
+      if (now - last > 2500 && !reduceMotion) {
+        tx = .5 + Math.sin(now / 1900) * .36;
+        ty = .5 + Math.sin(now / 1300) * .3;
+      }
+      x += (tx - x) * .16; y += (ty - y) * .16; r += (tr - r) * .12;
+      const mx = (x * 100).toFixed(2) + '%', my = (y * 100).toFixed(2) + '%';
+      [room, lit].forEach(el => { el.style.setProperty('--mx', mx); el.style.setProperty('--my', my); el.style.setProperty('--rad', r.toFixed(1) + 'px'); });
+      requestAnimationFrame(loop);
+    })(0);
+    return api;
+  }
+
+  const ART = [
+    '<svg viewBox="-10 -10 20 20" aria-hidden="true"><path d="M0 -10C1.6 -3 3 -1.6 10 0C3 1.6 1.6 3 0 10C-1.6 3 -3 1.6 -10 0C-3 -1.6 -1.6 -3 0 -10Z"/></svg>',
+    '<svg viewBox="-10 -10 20 20" aria-hidden="true"><circle r="8"/></svg>',
+    '<svg viewBox="-10 -10 20 20" aria-hidden="true"><path d="M0 -9A9 9 0 1 0 0 9A6 9 0 1 1 0 -9Z"/></svg>',
+  ];
+
+  /* ---------- A: cards in the dark ---------- */
+  const table = document.getElementById('table');
+  const deckBase = document.getElementById('deck-base');
+  const deckLit = document.getElementById('deck-lit');
+  const sayA = document.getElementById('say-a');
+  const lightA = flashlight(table, deckLit, { rad: 170, hotRad: 230 });
+  const cardHTML = (l, i, real) => `<div class="cd-in">
+      <div class="fc front"><span class="idx">${l.key}</span>${ART[i % 3]}<b>${l.name}</b></div>
+      <div class="fc back"><b>${l.name}</b><span>${l.handle}</span>
+        ${real ? `<${tagOf(l)} class="go" ${attrs(l)}>${l.copy ? 'Copy username' : 'Open'}</${tagOf(l)}>` : `<span class="go">${l.copy ? 'Copy username' : 'Open'}</span>`}</div>
+    </div>`;
+  const pairs = LINKS.map((l, i) => {
+    const b = document.createElement('div');
+    b.className = 'cd';
+    b.tabIndex = 0;
+    b.setAttribute('role', 'button');
+    b.setAttribute('aria-label', `${l.name}, flip card`);
+    b.innerHTML = cardHTML(l, i, true);
+    const c = document.createElement('div');
+    c.className = 'cd';
+    c.innerHTML = cardHTML(l, i, false);
+    [b, c].forEach(el => { el.style.cssText = vars(l); });
+    deckBase.appendChild(b); deckLit.appendChild(c);
+    const both = (cls, on) => [b, c].forEach(el => el.classList.toggle(cls, on));
+    const enter = () => { both('hot', true); lightA.hot(true, `var(--${l.c})`); sayA.innerHTML = `<b>${l.name}</b>, ${l.handle}. Click to flip.`; };
+    const leave = () => { both('hot', false); lightA.hot(false); };
+    b.addEventListener('pointerenter', enter);
+    b.addEventListener('pointerleave', leave);
+    b.addEventListener('focus', enter);
+    b.addEventListener('blur', leave);
+    const flip = () => {
+      const was = b.classList.contains('flipped');
+      pairs.forEach(p => p.both('flipped', false));
+      both('flipped', !was);
+    };
+    b.addEventListener('click', e => { if (!e.target.closest('.go')) flip(); });
+    b.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target === b) { e.preventDefault(); flip(); } });
+    const go = b.querySelector('.go');
+    if (l.copy) go.addEventListener('click', () => copyTo(l.copy, go, 'Copy username'));
+    return { b, c, both };
+  });
+  function layoutCards() {
+    const W = table.clientWidth, H = table.clientHeight;
+    const n = LINKS.length, mid = (n - 1) / 2;
+    const cw = Math.min(200, Math.max(112, W / 6.6));
+    const step = Math.min(cw * 1.02, (W - cw * 1.7) / (n - 1));
+    pairs.forEach((p, i) => {
+      const off = i - mid;
+      const left = W / 2 + off * step;
+      const top = H * .5 - cw * .7 + Math.pow(Math.abs(off), 2) * 9;
+      [p.b, p.c].forEach(el => {
+        el.style.setProperty('--cw', cw + 'px');
+        el.style.setProperty('--rot', off * 4 + 'deg');
+        el.style.left = left + 'px';
+        el.style.top = top + 'px';
+      });
+    });
+  }
+  layoutCards();
+  addEventListener('resize', layoutCards);
+
+  /* ---------- B: hidden mural ---------- */
+  const mural = document.getElementById('mural');
+  const muralLit = document.getElementById('mural-lit');
+  const namesBase = document.getElementById('names-base');
+  const namesLit = document.getElementById('names-lit');
+  const sayB = document.getElementById('say-b');
+  const lightB = flashlight(mural, muralLit, { rad: 200, hotRad: 280 });
+  LINKS.forEach(l => {
+    const el = document.createElement(tagOf(l));
+    el.style.cssText = vars(l);
+    if (l.copy) el.type = 'button'; else { el.href = l.href; el.target = '_blank'; el.rel = 'noopener'; }
+    el.innerHTML = `<span class="nm">${l.name}</span><span class="hd">${l.handle}</span>`;
+    const enter = () => { lightB.hot(true, `var(--${l.c})`); sayB.innerHTML = `<b>${l.name}</b>, ${l.handle}. ${l.copy ? 'Click to copy.' : 'Click to open.'}`; };
+    el.addEventListener('pointerenter', enter);
+    el.addEventListener('focus', enter);
+    el.addEventListener('pointerleave', () => lightB.hot(false));
+    el.addEventListener('blur', () => lightB.hot(false));
+    if (l.copy) el.addEventListener('click', () => copyTo(l.copy, el.querySelector('.hd'), l.handle));
+    namesBase.appendChild(el);
+    namesBase.appendChild(document.createTextNode(' '));
+    const s = document.createElement('span');
+    s.style.cssText = vars(l);
+    s.innerHTML = `<span class="nm">${l.name}</span><span class="hd">${l.handle}</span>`;
+    namesLit.appendChild(s);
+    namesLit.appendChild(document.createTextNode(' '));
+  });
+
+  // The mural: paper cut-outs in darkened palette colors
+  function rng(a) { return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function blob(r, cx, cy, R) {
+    const n = 5 + Math.floor(r() * 4), pts = [];
+    for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2 + (r() - .5) * .5, rad = R * (.6 + .4 * r()); pts.push([cx + Math.cos(a) * rad, cy + Math.sin(a) * rad]); }
+    let d = `M${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+    for (let i = 0; i < n; i++) {
+      const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+      d += `C${(p1[0] + (p2[0] - p0[0]) / 6).toFixed(1)} ${(p1[1] + (p2[1] - p0[1]) / 6).toFixed(1)} ${(p2[0] - (p3[0] - p1[0]) / 6).toFixed(1)} ${(p2[1] - (p3[1] - p1[1]) / 6).toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+    }
+    return d + 'Z';
+  }
+  function paintMural() {
+    const svg = document.getElementById('mural-art');
+    const W = mural.clientWidth, H = mural.clientHeight;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    const r = rng(42), colors = ['cobalt', 'coral', 'sun', 'leaf', 'lilac', 'violet'];
+    let out = '';
+    const count = Math.round(W * H / 26000);
+    for (let i = 0; i < count; i++) {
+      const R = 40 + r() * 120;
+      out += `<path d="${blob(r, r() * W, r() * H, R)}" style="fill: color-mix(in srgb, var(--${colors[i % 6]}) 32%, var(--night))"/>`;
+    }
+    svg.innerHTML = out;
+  }
+  paintMural();
+  addEventListener('resize', paintMural);
+})();
+</script>

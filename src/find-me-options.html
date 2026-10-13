@@ -1,0 +1,832 @@
+<title>Find me options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Newsreader:ital,opsz,wght@1,6..72,400&display=swap">
+<style>
+/* Layout: three full-height demos of the "Find me" section, stacked, each with a short caption. Same tokens as the G4SBO site, dark only. */
+:root {
+  --night: #0B0718;
+  --night-2: #151026;
+  --night-3: #1E1834;
+  --paper: #F1EEF8;
+  --muted: #A49DBF;
+  --line: #2A2340;
+  --cobalt: #3D5BFF;
+  --coral: #FF4F7B;
+  --sun: #FFC53D;
+  --leaf: #22C389;
+  --lilac: #B79CFF;
+  --violet: #7C3AED;
+  --font-display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-note: "Newsreader", Georgia, serif;
+  --gutter: clamp(16px, 4vw, 56px);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--night); overflow-x: clip; }
+body { margin: 0; color: var(--paper); font-family: var(--font-body); font-size: 1.0625rem; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
+[hidden] { display: none !important; }
+
+.intro { padding: clamp(3rem, 8vw, 6rem) var(--gutter) 2rem; max-width: 60rem; }
+.intro h1 { margin: 0; font-family: var(--font-display); font-size: clamp(2.5rem, 7vw, 5.5rem); font-weight: 800; font-variation-settings: "opsz" 96, "wdth" 75; line-height: .9; letter-spacing: -.02em; }
+.intro p { margin: 1rem 0 0; color: var(--muted); font-size: 1.25rem; max-width: 44ch; }
+
+.option { border-top: 1.5px solid var(--line); padding-block: clamp(2.5rem, 6vw, 4rem); }
+.cap { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem 1rem; padding: 0 var(--gutter) clamp(1.5rem, 4vw, 2.5rem); }
+.cap b { font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 800; font-variation-settings: "opsz" 48, "wdth" 80; }
+.cap span { color: var(--muted); font-family: var(--font-note); font-style: italic; font-size: 1.125rem; }
+.h2 { margin: 0 var(--gutter) 1.5rem; font-family: var(--font-display); font-size: clamp(2.5rem, 7vw, 6.5rem); font-weight: 800; font-variation-settings: "opsz" 96, "wdth" 75; line-height: .9; letter-spacing: -.02em; }
+
+/* ---------- Option 1: marquee rows ---------- */
+.rows { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--line); }
+.rows li { border-bottom: 2px solid var(--line); }
+.row {
+  all: unset;
+  box-sizing: border-box;
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  color: var(--c);
+  padding-block: clamp(.4rem, 1.2vw, .9rem);
+}
+.row::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: var(--c);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path .55s cubic-bezier(.7, 0, .2, 1);
+}
+.row:hover::before, .row:focus-visible::before { clip-path: inset(0 0 0 0); }
+.row:hover, .row:focus-visible { color: var(--fg); outline: none; }
+.row:focus-visible { box-shadow: inset 0 0 0 3px var(--sun); }
+.belt { position: relative; display: flex; width: max-content; animation: belt 22s linear infinite; }
+.rows li:nth-child(even) .belt { animation-direction: reverse; }
+.row:hover .belt { animation-duration: 9s; }
+.belt span {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(1rem, 2.5vw, 2rem);
+  padding-right: clamp(1rem, 2.5vw, 2rem);
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 10vw, 9rem);
+  font-weight: 800;
+  font-variation-settings: "opsz" 96, "wdth" 75;
+  line-height: .95;
+  letter-spacing: -.02em;
+  transition: color .3s;
+}
+.belt em { font-family: var(--font-note); font-weight: 400; font-size: .32em; letter-spacing: 0; }
+.belt svg { width: .45em; height: .45em; flex: none; fill: currentColor; }
+@keyframes belt { to { transform: translateX(-50%); } }
+
+/* ---------- Option 2: record player ---------- */
+.deck {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: center;
+  padding: 0 var(--gutter);
+}
+.turntable { position: relative; width: min(100%, 520px); aspect-ratio: 1; justify-self: center; }
+.platter {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: var(--night-3);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, .55), inset 0 0 0 10px var(--night-2);
+}
+.record {
+  position: absolute; inset: 5%;
+  border-radius: 50%;
+  background:
+    conic-gradient(from 30deg, transparent 0 12%, rgba(255, 255, 255, .09) 16%, transparent 22% 58%, rgba(255, 255, 255, .07) 62%, transparent 68%),
+    repeating-radial-gradient(circle, #0a0812 0 2px, #16121f 2px 4px);
+  animation: spin 1.9s linear infinite;
+  animation-play-state: paused;
+}
+.deck.playing .record { animation-play-state: running; }
+.label {
+  position: absolute; inset: 31%;
+  border-radius: 50%;
+  background: var(--c, var(--violet));
+  color: var(--fg, var(--paper));
+  display: grid;
+  place-content: center;
+  text-align: center;
+  transition: background-color .35s;
+}
+.label b { font-family: var(--font-display); font-size: clamp(1rem, 2.6vw, 1.6rem); font-weight: 800; font-variation-settings: "opsz" 48, "wdth" 75; line-height: 1; }
+.label small { font-size: .7rem; font-weight: 600; opacity: .8; }
+.label::after { content: ""; position: absolute; left: 50%; top: 50%; width: 7%; height: 7%; margin: -3.5% 0 0 -3.5%; border-radius: 50%; background: var(--night); }
+.arm {
+  position: absolute;
+  right: -2%; top: -4%;
+  width: 46%; height: 70%;
+  transform-origin: 82% 12%;
+  transform: rotate(-24deg);
+  transition: transform .8s cubic-bezier(.5, 0, .2, 1);
+  pointer-events: none;
+}
+.deck.playing .arm { transform: rotate(4deg); }
+.arm svg { width: 100%; height: 100%; overflow: visible; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.side { display: grid; gap: 1.25rem; min-width: 0; }
+.side-title { margin: 0; color: var(--muted); font-family: var(--font-note); font-style: italic; font-size: 1.25rem; }
+.tracks { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--line); counter-reset: t; }
+.tracks li { border-bottom: 1.5px solid var(--line); counter-increment: t; }
+.track {
+  all: unset;
+  box-sizing: border-box;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 1rem;
+  padding-block: .85rem;
+  cursor: pointer;
+}
+.track::before { content: counter(t, decimal-leading-zero); color: var(--muted); font-variant-numeric: tabular-nums; font-size: .9rem; }
+.track .tn { font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 2.4rem); font-weight: 800; font-variation-settings: "opsz" 64, "wdth" 78; line-height: 1; transition: color .2s, transform .3s; }
+.track .th { color: var(--muted); font-size: .9rem; }
+.track:hover .tn, .track:focus-visible .tn { color: var(--c); transform: translateX(.4rem); }
+.track[aria-pressed="true"] .tn { color: var(--c); }
+.track[aria-pressed="true"]::before { content: "▶"; color: var(--c); }
+.track:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+.play-row { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1.25rem; min-height: 3.2rem; }
+.go {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  border: 0;
+  border-radius: 999px;
+  padding: .85rem 1.5rem;
+  background: var(--c, var(--paper));
+  color: var(--fg, var(--night));
+  font-weight: 750;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .2s, background-color .3s;
+}
+.go:hover { transform: scale(1.04); }
+.hint { color: var(--muted); font-size: .95rem; }
+
+/* ---------- Option 3: orbit ---------- */
+.space { position: relative; height: clamp(560px, 92vh, 900px); overflow: hidden; }
+#stars { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.ring { position: absolute; left: 50%; top: 50%; border: 1.5px dashed var(--line); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+.sun-core {
+  position: absolute; left: 50%; top: 50%;
+  width: clamp(130px, 18vw, 220px); aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  display: grid; place-items: center;
+  z-index: 20;
+  pointer-events: none;
+}
+.sun-core svg { position: absolute; inset: 0; width: 100%; height: 100%; animation: spin 40s linear infinite; }
+.sun-core b { position: relative; font-family: var(--font-display); font-size: clamp(1.4rem, 3vw, 2.4rem); font-weight: 800; font-variation-settings: "opsz" 64, "wdth" 75; color: var(--paper); }
+.planet {
+  position: absolute; left: 0; top: 0;
+  width: var(--size); height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  border: 0; padding: 0;
+  border-radius: 50%;
+  background: var(--c);
+  color: var(--fg);
+  display: grid; place-content: center; text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: inset -10px -12px 0 rgba(0, 0, 0, .18), 0 0 0 0 var(--c);
+  transition: box-shadow .3s;
+  will-change: transform;
+}
+.planet b { font-family: var(--font-display); font-size: calc(var(--size) * .2); font-weight: 800; font-variation-settings: "opsz" 48, "wdth" 75; line-height: 1; }
+.planet small { font-size: .72rem; font-weight: 650; opacity: 0; max-height: 0; transition: opacity .25s; }
+.planet:hover, .planet:focus-visible { box-shadow: inset -10px -12px 0 rgba(0, 0, 0, .18), 0 0 0 10px color-mix(in srgb, var(--c) 30%, transparent); outline: none; }
+.planet:hover small, .planet:focus-visible small { opacity: .9; max-height: 2em; }
+.orbit-hint { position: absolute; left: var(--gutter); bottom: 1.25rem; color: var(--muted); font-family: var(--font-note); font-style: italic; z-index: 30; }
+
+@media (max-width: 820px) {
+  .deck { grid-template-columns: minmax(0, 1fr); }
+  .turntable { width: min(100%, 380px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .belt, .record, .sun-core svg { animation: none; }
+  .row::before, .arm { transition: none; }
+}
+</style>
+
+<header class="intro">
+  <h1>Find me, seven ways</h1>
+  <p>Siete ideas para la sección de redes. Pruébalas con el mouse y dime cuál te gusta, o qué mezclarías.</p>
+</header>
+
+<!-- Option 1 -->
+<section class="option" aria-labelledby="o1">
+  <div class="cap"><b id="o1">Opción 1: Filas en movimiento</b><span>Cada red corre de lado; al pasar el mouse la fila se llena de color y acelera.</span></div>
+  <ul class="rows" id="rows"></ul>
+</section>
+
+<!-- Option 2 -->
+<section class="option" aria-labelledby="o2">
+  <div class="cap"><b id="o2">Opción 2: Tocadiscos</b><span>Tus redes son las canciones del disco. Elige una y suena.</span></div>
+  <div class="deck" id="deck">
+    <div class="turntable" aria-hidden="true">
+      <div class="platter"></div>
+      <div class="record"><div class="label" id="rec-label"><b id="rec-name">G4SBO</b><small id="rec-handle">Side A</small></div></div>
+      <div class="arm">
+        <svg viewBox="0 0 100 150">
+          <circle cx="82" cy="18" r="10" fill="var(--night-3)" stroke="var(--muted)" stroke-width="2"/>
+          <path d="M82 18 L72 120 L58 138" fill="none" stroke="var(--paper)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="48" y="132" width="18" height="12" rx="3" transform="rotate(-35 57 138)" fill="var(--paper)"/>
+        </svg>
+      </div>
+    </div>
+    <div class="side">
+      <h2 class="h2" style="margin: 0;">Find me</h2>
+      <p class="side-title">Side A, six tracks</p>
+      <ol class="tracks" id="tracks"></ol>
+      <div class="play-row">
+        <a class="go" id="go" href="#" target="_blank" rel="noopener" hidden>Open</a>
+        <span class="hint" id="deck-hint">Pick a track to drop the needle.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Option 3 -->
+<section class="option" aria-labelledby="o3">
+  <div class="cap"><b id="o3">Opción 3: Órbita</b><span>Tus redes giran alrededor de G4SBO. Pasa el mouse y todo se detiene.</span></div>
+  <div class="space" id="space">
+    <canvas id="stars" aria-hidden="true"></canvas>
+    <div class="sun-core" aria-hidden="true">
+      <svg viewBox="-70 -70 140 140"><path id="core-path" fill="var(--violet)"/></svg>
+      <b>G4SBO</b>
+    </div>
+    <div id="planets"></div>
+    <span class="orbit-hint" id="orbit-hint">Hover a planet to stop the orbit.</span>
+  </div>
+</section>
+
+<script>
+(() => {
+  const LINKS = [
+    { name: 'GitHub', handle: 'yo-gabriel-portfolio-here', href: 'https://github.com/yo-gabriel-portfolio-here', c: 'cobalt', fg: 'paper', act: 'Open GitHub' },
+    { name: 'Instagram', handle: '@_gasbo', href: 'https://instagram.com/_gasbo', c: 'coral', fg: 'night', act: 'Open Instagram' },
+    { name: 'TikTok', handle: '@gabo2575', href: 'https://www.tiktok.com/@gabo2575', c: 'lilac', fg: 'night', act: 'Open TikTok' },
+    { name: 'Spotify', handle: 'G4SBO', href: 'https://open.spotify.com/user/wazz1majwo2c3iwky0lexag2l', c: 'leaf', fg: 'night', act: 'Open Spotify' },
+    { name: 'Snapchat', handle: 'Gabriel_R', href: 'https://www.snapchat.com/add/gabriel_r97106', c: 'sun', fg: 'night', act: 'Add on Snapchat' },
+    { name: 'Discord', handle: 'G4SBX', copy: 'G4SBX', c: 'violet', fg: 'paper', act: 'Copy username' },
+  ];
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const vars = l => `--c: var(--${l.c}); --fg: var(--${l.fg});`;
+  const STAR = '<svg viewBox="-10 -10 20 20" aria-hidden="true"><path d="M0 -10C1.6 -3 3 -1.6 10 0C3 1.6 1.6 3 0 10C-1.6 3 -3 1.6 -10 0C-3 -1.6 -1.6 -3 0 -10Z"/></svg>';
+  const copy = (text, el, back) => {
+    const done = msg => { el.textContent = msg; setTimeout(() => { el.textContent = back; }, 2000); };
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => done('Copied ' + text), () => done(text));
+    else done(text);
+  };
+
+  /* ---------- Option 1 ---------- */
+  const rows = document.getElementById('rows');
+  LINKS.forEach(l => {
+    const unit = `<span>${l.name}<em>${l.handle}</em>${STAR}</span>`;
+    const li = document.createElement('li');
+    const tag = l.copy ? 'button' : 'a';
+    li.innerHTML = `<${tag} class="row" style="${vars(l)}" ${l.copy ? 'type="button"' : `href="${l.href}" target="_blank" rel="noopener"`} aria-label="${l.act}"><span class="belt">${unit.repeat(4)}${unit.repeat(4)}</span></${tag}>`;
+    if (l.copy) li.firstChild.addEventListener('click', () => {
+      const ems = li.querySelectorAll('em');
+      ems.forEach(em => copy(l.copy, em, l.handle));
+    });
+    rows.appendChild(li);
+  });
+
+  /* ---------- Option 2 ---------- */
+  const deck = document.getElementById('deck');
+  const tracks = document.getElementById('tracks');
+  const label = document.getElementById('rec-label');
+  const go = document.getElementById('go');
+  const deckHint = document.getElementById('deck-hint');
+  LINKS.forEach((l, i) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<button class="track" type="button" aria-pressed="false" style="${vars(l)}"><span class="tn">${l.name}</span><span class="th">${l.handle}</span></button>`;
+    const btn = li.firstChild;
+    btn.addEventListener('click', () => {
+      tracks.querySelectorAll('.track').forEach(t => t.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+      label.style.cssText = vars(l);
+      go.style.cssText = vars(l);
+      document.getElementById('rec-name').textContent = l.name;
+      document.getElementById('rec-handle').textContent = l.handle;
+      deck.classList.remove('playing');
+      void deck.offsetWidth;
+      deck.classList.add('playing');
+      go.hidden = false;
+      go.textContent = l.act;
+      if (l.copy) { go.removeAttribute('href'); go.setAttribute('role', 'button'); go.onclick = e => { e.preventDefault(); copy(l.copy, go, l.act); }; }
+      else { go.href = l.href; go.removeAttribute('role'); go.onclick = null; }
+      deckHint.textContent = `Now playing: ${l.name}`;
+    });
+    tracks.appendChild(li);
+  });
+
+  /* ---------- Option 3 ---------- */
+  // Core shape: a soft cut-out blob
+  (() => {
+    const pts = [], n = 7;
+    for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, r = 60 * (.82 + .18 * Math.sin(i * 2.3)); pts.push([Math.cos(a) * r, Math.sin(a) * r]); }
+    let d = `M${pts[0][0]} ${pts[0][1]}`;
+    for (let i = 0; i < n; i++) {
+      const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+      d += `C${p1[0] + (p2[0] - p0[0]) / 6} ${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6} ${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]} ${p2[1]}`;
+    }
+    document.getElementById('core-path').setAttribute('d', d + 'Z');
+  })();
+
+  const space = document.getElementById('space');
+  const planetsEl = document.getElementById('planets');
+  // Three rings, two planets each, opposite sides
+  const ORBITS = [{ k: .5, speed: .28 }, { k: .74, speed: -.19 }, { k: .98, speed: .13 }];
+  let squash = .55, unit = 1;
+  const rings = ORBITS.map(() => { const r = document.createElement('div'); r.className = 'ring'; space.insertBefore(r, planetsEl); return r; });
+  const planets = LINKS.map((l, i) => {
+    const tag = l.copy ? 'button' : 'a';
+    const el = document.createElement(tag);
+    el.className = 'planet';
+    el.style.cssText = vars(l);
+    if (l.copy) el.type = 'button'; else { el.href = l.href; el.target = '_blank'; el.rel = 'noopener'; }
+    el.innerHTML = `<b>${l.name}</b><small>${l.handle}</small>`;
+    if (l.copy) el.addEventListener('click', () => copy(l.copy, el.querySelector('small'), l.handle));
+    planetsEl.appendChild(el);
+    return { el, orbit: i % 3, a: (i < 3 ? 0 : Math.PI) + (i % 3) * 2.1, size: [118, 104, 112, 124, 98, 108][i] };
+  });
+  let speedMul = 1, target = 1, hoverOn = false;
+  space.addEventListener('pointerover', e => { if (e.target.closest('.planet')) { target = 0; hoverOn = true; } });
+  space.addEventListener('pointerout', e => { if (e.target.closest('.planet')) { target = 1; hoverOn = false; } });
+  space.addEventListener('focusin', () => { target = 0; });
+  space.addEventListener('focusout', () => { target = 1; });
+
+  // Stars
+  const stars = document.getElementById('stars');
+  const sctx = stars.getContext('2d');
+  let starList = [], SW = 1, SH = 1;
+  function sizeSpace() {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const r = space.getBoundingClientRect();
+    SW = r.width; SH = r.height;
+    stars.width = SW * dpr; stars.height = SH * dpr;
+    sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    starList = Array.from({ length: Math.round(SW * SH / 5000) }, () => ({ x: Math.random() * SW, y: Math.random() * SH, r: Math.random() * 1.3 + .2, p: Math.random() * 6.28, s: .5 + Math.random() * 1.5 }));
+    squash = SW < 700 ? 1.25 : .55;
+    const base = Math.min(SW * .42, SH * .6 / squash);
+    unit = Math.min(1, base / 330);
+    planets.forEach(p => p.el.style.setProperty('--size', Math.round(p.size * Math.max(.62, unit)) + 'px'));
+    ORBITS.forEach((o, i) => { rings[i].style.width = base * o.k * 2 + 'px'; rings[i].style.height = base * o.k * 2 * squash + 'px'; });
+  }
+  sizeSpace();
+  addEventListener('resize', sizeSpace);
+
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    speedMul += (target - speedMul) * .08;
+    const base = Math.min(SW * .42, SH * .6 / squash);
+    planets.forEach(p => {
+      const o = ORBITS[p.orbit];
+      if (!reduceMotion) p.a += o.speed * dt * speedMul;
+      const x = SW / 2 + Math.cos(p.a) * base * o.k;
+      const y = SH / 2 + Math.sin(p.a) * base * o.k * squash;
+      const depth = (Math.sin(p.a) + 1) / 2; // 0 back, 1 front
+      const scale = .72 + depth * .38;
+      p.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${scale.toFixed(3)})`;
+      p.el.style.zIndex = depth > .5 ? 25 : 10;
+      p.el.style.opacity = (.55 + depth * .45).toFixed(2);
+    });
+    sctx.clearRect(0, 0, SW, SH);
+    starList.forEach(s => {
+      const tw = reduceMotion ? .7 : .45 + .55 * Math.abs(Math.sin(now / 1000 * s.s + s.p));
+      sctx.globalAlpha = tw;
+      sctx.fillStyle = '#F1EEF8';
+      sctx.beginPath(); sctx.arc(s.x, s.y, s.r, 0, 6.283); sctx.fill();
+    });
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+
+<style>
+/* ---------- Option 4: free fall ---------- */
+.pit {
+  position: relative;
+  height: clamp(520px, 78vh, 760px);
+  margin-inline: var(--gutter);
+  border-radius: 28px;
+  background: var(--night-2);
+  overflow: hidden;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.piece-el {
+  position: absolute; left: 0; top: 0;
+  display: grid; place-content: center; text-align: center;
+  background: var(--c); color: var(--fg);
+  text-decoration: none;
+  cursor: grab;
+  will-change: transform;
+  -webkit-user-drag: none;
+  border: 0; padding: 0;
+  box-shadow: inset -8px -10px 0 rgba(0, 0, 0, .14);
+}
+.piece-el:active { cursor: grabbing; }
+.piece-el b { font-family: var(--font-display); font-size: calc(var(--h) * .26); font-weight: 800; font-variation-settings: "opsz" 64, "wdth" 75; line-height: 1; pointer-events: none; }
+.piece-el small { font-size: .75rem; font-weight: 650; opacity: .85; pointer-events: none; }
+.pit-bar { position: absolute; left: 1.25rem; right: 1.25rem; top: 1rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; z-index: 5; color: var(--muted); font-family: var(--font-note); font-style: italic; }
+.pit-bar button { font-family: var(--font-body); font-style: normal; font-weight: 700; background: var(--paper); color: var(--night); border: 0; border-radius: 999px; padding: .55rem 1.1rem; cursor: pointer; }
+
+/* ---------- Option 5: keycaps ---------- */
+.keys {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(.9rem, 2vw, 1.5rem);
+  padding: 0 var(--gutter);
+  max-width: 1100px;
+}
+.key {
+  display: block;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--c) 55%, #000);
+  padding-bottom: 14px;
+  color: var(--fg);
+  text-decoration: none;
+  cursor: pointer;
+  border: 0;
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  box-shadow: 0 18px 30px rgba(0, 0, 0, .45);
+}
+.key-top {
+  position: relative;
+  display: grid;
+  align-content: space-between;
+  aspect-ratio: 1.45;
+  padding: clamp(.9rem, 2vw, 1.4rem);
+  border-radius: 18px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c) 85%, #fff), var(--c) 45%);
+  box-shadow: inset 0 -7px 0 rgba(0, 0, 0, .14), inset 0 2px 0 rgba(255, 255, 255, .4);
+  transition: transform .07s ease-out;
+}
+.key:hover .key-top { transform: translateY(3px); }
+.key:active .key-top, .key.down .key-top { transform: translateY(12px); }
+.key:focus-visible { outline: 3px solid var(--sun); outline-offset: 4px; }
+.key i { font-style: normal; font-weight: 800; font-size: clamp(1rem, 2vw, 1.4rem); opacity: .7; }
+.key b { font-family: var(--font-display); font-size: clamp(1.5rem, 3.6vw, 3rem); font-weight: 800; font-variation-settings: "opsz" 64, "wdth" 75; line-height: .95; }
+.key small { display: block; font-size: .8rem; font-weight: 650; opacity: .8; }
+.keys-hint { padding: 1.5rem var(--gutter) 0; margin: 0; color: var(--muted); font-family: var(--font-note); font-style: italic; font-size: 1.125rem; }
+.keys-hint kbd { font-family: var(--font-body); font-style: normal; font-weight: 700; border: 1.5px solid var(--line); border-bottom-width: 3px; border-radius: 6px; padding: 0 .4em; color: var(--paper); }
+
+/* ---------- Option 6: spotlight ---------- */
+.stage { position: relative; padding: 0 var(--gutter); cursor: none; }
+.words {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 10.5vw, 10rem);
+  font-weight: 800;
+  font-variation-settings: "opsz" 96, "wdth" 75;
+  line-height: .98;
+  letter-spacing: -.02em;
+}
+.words a, .words button, .words span {
+  display: inline;
+  font: inherit;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-decoration: none;
+  margin-right: .18em;
+}
+.base a, .base button {
+  color: transparent;
+  -webkit-text-stroke: 1.5px color-mix(in srgb, var(--paper) 35%, transparent);
+  cursor: none;
+  transition: color .25s, -webkit-text-stroke-color .25s;
+}
+.base a:hover, .base button:hover, .base a:focus-visible, .base button:focus-visible { color: var(--c); -webkit-text-stroke-color: var(--c); outline: none; }
+.lit {
+  position: absolute; inset: 0 var(--gutter);
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle var(--rad, 190px) at var(--mx, 50%) var(--my, 50%), #000 0 55%, transparent 100%);
+  mask-image: radial-gradient(circle var(--rad, 190px) at var(--mx, 50%) var(--my, 50%), #000 0 55%, transparent 100%);
+}
+.lit span { color: var(--c); }
+.spot-cap { min-height: 1.6em; margin: 1.5rem var(--gutter) 0; color: var(--muted); font-size: 1.25rem; }
+.spot-cap b { color: var(--paper); }
+
+/* ---------- Option 7: card fan ---------- */
+.fan {
+  position: relative;
+  height: clamp(460px, 70vh, 640px);
+  --spread: 9deg;
+  --cw: clamp(150px, 17vw, 230px);
+}
+.fan:hover, .fan:focus-within { --spread: 14deg; }
+.card {
+  position: absolute;
+  left: 50%; bottom: 16%;
+  width: var(--cw);
+  aspect-ratio: .7;
+  margin-left: calc(var(--cw) / -2);
+  transform-origin: 50% 160%;
+  transform: rotate(calc((var(--i) - 2.5) * var(--spread))) translateY(var(--lift, 0px));
+  transition: transform .5s cubic-bezier(.2, .9, .2, 1);
+  perspective: 900px;
+  cursor: pointer;
+}
+.card:hover, .card:focus-visible, .card.flipped { --lift: -56px; z-index: 10; outline: none; }
+.card-inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .7s cubic-bezier(.3, 1.3, .5, 1); }
+.card.flipped .card-inner { transform: rotateY(180deg); }
+.face {
+  position: absolute; inset: 0;
+  border-radius: 16px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, .5);
+  overflow: hidden;
+}
+.front { background: var(--c); color: var(--fg); padding: .9rem; display: grid; align-content: space-between; border: 4px solid var(--paper); }
+.front .idx { font-weight: 800; font-size: .95rem; line-height: 1; }
+.front svg { position: absolute; left: 50%; top: 46%; width: 70%; height: 70%; transform: translate(-50%, -50%); fill: var(--fg); opacity: .9; }
+.front b { position: relative; font-family: var(--font-display); font-size: calc(var(--cw) * .18); font-weight: 800; font-variation-settings: "opsz" 64, "wdth" 75; line-height: .9; }
+.back { transform: rotateY(180deg); background: var(--night-2); border: 4px solid var(--c); display: grid; place-content: center; gap: .9rem; text-align: center; padding: 1rem; }
+.back b { font-family: var(--font-display); font-size: calc(var(--cw) * .14); font-weight: 800; font-variation-settings: "opsz" 64, "wdth" 75; color: var(--c); }
+.back span { color: var(--muted); font-size: .85rem; overflow-wrap: anywhere; }
+.back .go { justify-self: center; padding: .6rem 1.1rem; font-size: .9rem; }
+.fan-hint { text-align: center; margin: 0; color: var(--muted); font-family: var(--font-note); font-style: italic; font-size: 1.125rem; }
+
+@media (max-width: 820px) {
+  .keys { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fan { --spread: 7deg; }
+  .fan:hover, .fan:focus-within { --spread: 9deg; }
+}
+@media (hover: none) { .stage, .base a, .base button { cursor: auto; } }
+@media (prefers-reduced-motion: reduce) {
+  .card, .card-inner, .key-top { transition: none; }
+}
+</style>
+
+<!-- Option 4 -->
+<section class="option" aria-labelledby="o4">
+  <div class="cap"><b id="o4">Opción 4: Caída libre</b><span>Tus redes caen con física real. Agárralas, lánzalas, y haz clic para abrir.</span></div>
+  <div class="pit" id="pit">
+    <div class="pit-bar"><span id="pit-hint">Grab one and throw it.</span><button type="button" id="redrop">Drop again</button></div>
+  </div>
+</section>
+
+<!-- Option 5 -->
+<section class="option" aria-labelledby="o5" id="keys-section">
+  <div class="cap"><b id="o5">Opción 5: Teclado</b><span>Teclas mecánicas gigantes. Se hunden, suenan, y también responden a tu teclado.</span></div>
+  <div class="keys" id="keys"></div>
+  <p class="keys-hint">Or press <kbd>G</kbd> <kbd>I</kbd> <kbd>T</kbd> <kbd>S</kbd> <kbd>C</kbd> <kbd>D</kbd> on your keyboard.</p>
+</section>
+
+<!-- Option 6 -->
+<section class="option" aria-labelledby="o6">
+  <div class="cap"><b id="o6">Opción 6: Linterna</b><span>Tu cursor es una linterna que ilumina los nombres con su color.</span></div>
+  <div class="stage" id="stage">
+    <p class="words base" id="base"></p>
+    <p class="words lit" id="lit" aria-hidden="true"></p>
+  </div>
+  <p class="spot-cap" id="spot-cap">Move the light over a name.</p>
+</section>
+
+<!-- Option 7 -->
+<section class="option" aria-labelledby="o7">
+  <div class="cap"><b id="o7">Opción 7: Abanico de cartas</b><span>Tus redes son cartas en tu mano. Pasa el mouse para abrirlas y haz clic para voltear una.</span></div>
+  <div class="fan" id="fan"></div>
+  <p class="fan-hint">Click a card to flip it.</p>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+<script>
+(() => {
+  const LINKS = [
+    { name: 'GitHub', handle: 'yo-gabriel-portfolio-here', href: 'https://github.com/yo-gabriel-portfolio-here', c: 'cobalt', fg: 'paper', key: 'G' },
+    { name: 'Instagram', handle: '@_gasbo', href: 'https://instagram.com/_gasbo', c: 'coral', fg: 'night', key: 'I' },
+    { name: 'TikTok', handle: '@gabo2575', href: 'https://www.tiktok.com/@gabo2575', c: 'lilac', fg: 'night', key: 'T' },
+    { name: 'Spotify', handle: 'G4SBO', href: 'https://open.spotify.com/user/wazz1majwo2c3iwky0lexag2l', c: 'leaf', fg: 'night', key: 'S' },
+    { name: 'Snapchat', handle: 'Gabriel_R', href: 'https://www.snapchat.com/add/gabriel_r97106', c: 'sun', fg: 'night', key: 'C' },
+    { name: 'Discord', handle: 'G4SBX', copy: 'G4SBX', c: 'violet', fg: 'paper', key: 'D' },
+  ];
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const vars = l => `--c: var(--${l.c}); --fg: var(--${l.fg});`;
+  const linkAttrs = l => l.copy ? 'type="button"' : `href="${l.href}" target="_blank" rel="noopener"`;
+  const tagOf = l => l.copy ? 'button' : 'a';
+  function copyTo(text, el, back) {
+    const done = msg => { el.textContent = msg; setTimeout(() => { el.textContent = back; }, 2000); };
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => done('Copied!'), () => done(text));
+    else done(text);
+  }
+
+  /* ---------- Option 4: free fall (Matter.js) ---------- */
+  const pit = document.getElementById('pit');
+  if (window.Matter) {
+    const { Engine, Bodies, Composite, Body, Mouse, MouseConstraint } = Matter;
+    const engine = Engine.create();
+    engine.gravity.y = 1;
+    let PW = pit.clientWidth, PH = pit.clientHeight;
+    const wallOpts = { isStatic: true };
+    const ground = Bodies.rectangle(PW / 2, PH + 30, PW * 3, 60, wallOpts);
+    const left = Bodies.rectangle(-30, PH / 2 - PH, 60, PH * 4, wallOpts);
+    const right = Bodies.rectangle(PW + 30, PH / 2 - PH, 60, PH * 4, wallOpts);
+    Composite.add(engine.world, [ground, left, right]);
+
+    const unit = () => Math.max(.62, Math.min(1, PW / 1000));
+    const pieces = LINKS.map((l, i) => {
+      const round = i % 2 === 0;
+      const el = document.createElement(tagOf(l));
+      el.className = 'piece-el';
+      if (l.copy) el.type = 'button'; else { el.href = l.href; el.target = '_blank'; el.rel = 'noopener'; el.draggable = false; }
+      el.innerHTML = `<b>${l.name}</b><small>${l.handle.length > 14 ? l.handle.slice(0, 12) + '…' : l.handle}</small>`;
+      pit.appendChild(el);
+      return { l, el, round, body: null, w: 0, h: 0 };
+    });
+    function makeBodies() {
+      const u = unit();
+      pieces.forEach((p, i) => {
+        if (p.body) Composite.remove(engine.world, p.body);
+        p.w = p.round ? 170 * u : 250 * u;
+        p.h = p.round ? 170 * u : 110 * u;
+        const x = PW * (.15 + .7 * Math.random()), y = -120 - i * 140;
+        p.body = p.round
+          ? Bodies.circle(x, y, p.w / 2, { restitution: .55, friction: .2 })
+          : Bodies.rectangle(x, y, p.w, p.h, { chamfer: { radius: p.h / 2 }, restitution: .45, friction: .2 });
+        Body.setAngle(p.body, (Math.random() - .5) * 1.2);
+        p.el.style.cssText = vars(p.l) + `width:${p.w}px;height:${p.h}px;border-radius:${p.h / 2}px;--h:${p.h}px;`;
+        Composite.add(engine.world, p.body);
+      });
+    }
+    makeBodies();
+
+    if (finePointer) {
+      const mouse = Mouse.create(pit);
+      mouse.element.removeEventListener('wheel', mouse.mousewheel);
+      mouse.element.removeEventListener('mousewheel', mouse.mousewheel);
+      mouse.element.removeEventListener('DOMMouseScroll', mouse.mousewheel);
+      const mc = MouseConstraint.create(engine, { mouse, constraint: { stiffness: .18, render: { visible: false } } });
+      Composite.add(engine.world, mc);
+    } else {
+      document.getElementById('pit-hint').textContent = 'Tap one to open it.';
+    }
+    // A drag shouldn't count as a click
+    pieces.forEach(p => {
+      let sx = 0, sy = 0;
+      p.el.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; });
+      p.el.addEventListener('click', e => {
+        if (Math.hypot(e.clientX - sx, e.clientY - sy) > 6) { e.preventDefault(); return; }
+        if (p.l.copy) copyTo(p.l.copy, p.el.querySelector('small'), p.l.handle);
+      });
+    });
+    document.getElementById('redrop').addEventListener('click', makeBodies);
+
+    let running = false;
+    new IntersectionObserver(([e]) => { running = e.isIntersecting; }, { threshold: .2 }).observe(pit);
+    addEventListener('resize', () => {
+      PW = pit.clientWidth; PH = pit.clientHeight;
+      Body.setPosition(ground, { x: PW / 2, y: PH + 30 });
+      Body.setPosition(right, { x: PW + 30, y: PH / 2 - PH });
+    });
+    (function tick() {
+      if (running) {
+        Engine.update(engine, 1000 / 60);
+        pieces.forEach(p => {
+          const { x, y } = p.body.position;
+          p.el.style.transform = `translate(${(x - p.w / 2).toFixed(1)}px, ${(y - p.h / 2).toFixed(1)}px) rotate(${p.body.angle.toFixed(3)}rad)`;
+        });
+      }
+      requestAnimationFrame(tick);
+    })();
+  } else {
+    pit.insertAdjacentHTML('beforeend', '<p style="padding:4rem 1.5rem;color:var(--muted)">The physics library did not load.</p>');
+  }
+
+  /* ---------- Option 5: keycaps ---------- */
+  const keys = document.getElementById('keys');
+  let audio = null;
+  function clack() {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const len = audio.sampleRate * .05, buf = audio.createBuffer(1, len, audio.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 6);
+      const src = audio.createBufferSource(), f = audio.createBiquadFilter(), g = audio.createGain();
+      f.type = 'bandpass'; f.frequency.value = 2400 + Math.random() * 800; f.Q.value = 1.2; g.gain.value = .5;
+      src.buffer = buf; src.connect(f).connect(g).connect(audio.destination); src.start();
+    } catch (e) { /* sound is optional */ }
+  }
+  const keyEls = {};
+  LINKS.forEach(l => {
+    const el = document.createElement(tagOf(l));
+    el.className = 'key';
+    el.style.cssText = vars(l);
+    if (l.copy) el.type = 'button'; else { el.href = l.href; el.target = '_blank'; el.rel = 'noopener'; }
+    el.innerHTML = `<span class="key-top"><i>${l.key}</i><span><b>${l.name}</b><small>${l.handle}</small></span></span>`;
+    el.addEventListener('pointerdown', clack);
+    if (l.copy) el.addEventListener('click', () => copyTo(l.copy, el.querySelector('small'), l.handle));
+    keys.appendChild(el);
+    keyEls[l.key] = el;
+  });
+  let keysVisible = false;
+  new IntersectionObserver(([e]) => { keysVisible = e.isIntersecting; }).observe(document.getElementById('keys-section'));
+  addEventListener('keydown', e => {
+    if (!keysVisible || e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+    const el = keyEls[e.key.toUpperCase()];
+    if (!el) return;
+    el.classList.add('down'); clack();
+  });
+  addEventListener('keyup', e => {
+    const el = keyEls[e.key.toUpperCase()];
+    if (!el || !el.classList.contains('down')) return;
+    el.classList.remove('down');
+    el.click();
+  });
+
+  /* ---------- Option 6: spotlight ---------- */
+  const stage = document.getElementById('stage');
+  const base = document.getElementById('base');
+  const lit = document.getElementById('lit');
+  const cap = document.getElementById('spot-cap');
+  LINKS.forEach(l => {
+    const el = document.createElement(tagOf(l));
+    el.style.cssText = vars(l);
+    if (l.copy) el.type = 'button'; else { el.href = l.href; el.target = '_blank'; el.rel = 'noopener'; }
+    el.textContent = l.name;
+    const say = () => { cap.innerHTML = `<b>${l.name}</b>, ${l.handle}. ${l.copy ? 'Click to copy.' : 'Click to open.'}`; };
+    el.addEventListener('pointerenter', say);
+    el.addEventListener('focus', say);
+    if (l.copy) el.addEventListener('click', () => copyTo(l.copy, cap, 'Move the light over a name.'));
+    base.appendChild(el);
+    base.appendChild(document.createTextNode(' '));
+    const s = document.createElement('span');
+    s.style.cssText = vars(l);
+    s.textContent = l.name;
+    lit.appendChild(s);
+    lit.appendChild(document.createTextNode(' '));
+  });
+  let spotX = .5, spotY = .5, tx = .5, ty = .5, lastMove = 0;
+  stage.addEventListener('pointermove', e => {
+    const r = stage.getBoundingClientRect();
+    tx = (e.clientX - r.left) / r.width; ty = (e.clientY - r.top) / r.height;
+    lastMove = performance.now();
+  });
+  (function spot(now) {
+    // Wander on its own when nobody is moving it
+    if (now - lastMove > 2500 && !reduceMotion) {
+      tx = .5 + Math.sin(now / 1700) * .38;
+      ty = .5 + Math.sin(now / 1100) * .35;
+    }
+    spotX += (tx - spotX) * .15; spotY += (ty - spotY) * .15;
+    lit.style.setProperty('--mx', (spotX * 100).toFixed(2) + '%');
+    lit.style.setProperty('--my', (spotY * 100).toFixed(2) + '%');
+    requestAnimationFrame(spot);
+  })(0);
+
+  /* ---------- Option 7: card fan ---------- */
+  const fan = document.getElementById('fan');
+  const ART = [
+    '<svg viewBox="-10 -10 20 20" aria-hidden="true"><path d="M0 -10C1.6 -3 3 -1.6 10 0C3 1.6 1.6 3 0 10C-1.6 3 -3 1.6 -10 0C-3 -1.6 -1.6 -3 0 -10Z"/></svg>',
+    '<svg viewBox="-10 -10 20 20" aria-hidden="true"><circle r="8"/></svg>',
+    '<svg viewBox="-10 -10 20 20" aria-hidden="true"><path d="M0 -9A9 9 0 1 0 0 9A6 9 0 1 1 0 -9Z"/></svg>',
+  ];
+  LINKS.forEach((l, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', `${l.name}, flip card`);
+    card.style.cssText = vars(l) + `--i: ${i};`;
+    card.innerHTML = `<div class="card-inner">
+      <div class="face front"><span class="idx">${l.key}</span>${ART[i % 3]}<b>${l.name}</b></div>
+      <div class="face back"><b>${l.name}</b><span>${l.handle}</span>
+        <${tagOf(l)} class="go" ${linkAttrs(l)} style="${vars(l)}">${l.copy ? 'Copy username' : 'Open'}</${tagOf(l)}></div>
+    </div>`;
+    const flip = () => {
+      const was = card.classList.contains('flipped');
+      fan.querySelectorAll('.card.flipped').forEach(c => c.classList.remove('flipped'));
+      if (!was) card.classList.add('flipped');
+    };
+    card.addEventListener('click', e => { if (!e.target.closest('.go')) flip(); });
+    card.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target === card) { e.preventDefault(); flip(); } });
+    const go = card.querySelector('.go');
+    if (l.copy) go.addEventListener('click', () => copyTo(l.copy, go, 'Copy username'));
+    fan.appendChild(card);
+  });
+})();
+</script>
