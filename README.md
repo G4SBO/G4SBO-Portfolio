@@ -1,4 +1,4 @@
-# G4SBO, portfolio
+# G4SBO's Portfolio
 
 Personal site, live at **[g4sbo.com](https://g4sbo.com)**.
 
