@@ -406,23 +406,27 @@ footer {
 
 /* On repeat: now playing record tinted by its cover, a 24-hour listening clock, and a river of records that play a preview on hover */
 .or { position: relative; }
+/* Volume pinned to the top: in the header row when it fits, just under it when it doesn't */
 .or-vol {
-  position: sticky; top: calc(4.4rem + env(safe-area-inset-top, 0px)); z-index: 40;
-  width: max-content; max-width: 100%;
-  margin: calc(clamp(2rem, 5vw, 3.5rem) * -1 + .5rem) 0 1.5rem auto;
+  position: fixed; z-index: 56; top: calc(4.4rem + env(safe-area-inset-top, 0px)); right: var(--gutter);
+  width: max-content; max-width: calc(100vw - 32px);
   display: flex; align-items: center; gap: .75rem;
-  padding: .4rem 1rem .4rem .4rem; border-radius: 999px;
+  padding: .3rem 1rem .3rem .3rem; border-radius: 999px;
   background: color-mix(in srgb, var(--night-2) 88%, transparent);
   border: 1.5px solid var(--line);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  opacity: 0; visibility: hidden; transform: translateY(-8px);
+  transition: opacity .35s, transform .45s cubic-bezier(.2, .9, .25, 1), visibility 0s .45s;
 }
+.or-vol.show { opacity: 1; visibility: visible; transform: none; transition: opacity .35s, transform .45s cubic-bezier(.2, .9, .25, 1), visibility 0s; }
+.or-vol.head { right: auto; }
 .or-mute {
-  width: 42px; height: 42px; flex: none; border: 0; border-radius: 50%; cursor: pointer;
+  width: 36px; height: 36px; flex: none; border: 0; border-radius: 50%; cursor: pointer;
   display: grid; place-items: center; background: var(--sun); color: var(--night);
   animation: or-nudge 2.4s ease-in-out infinite;
 }
 .or-mute[aria-pressed="true"] { background: var(--leaf); animation: none; }
-.or-mute svg { width: 22px; height: 22px; }
+.or-mute svg { width: 20px; height: 20px; }
 @keyframes or-nudge { 0%, 100% { transform: none; } 50% { transform: scale(1.08); } }
 .or-vol input[type="range"] {
   -webkit-appearance: none; appearance: none;
@@ -536,7 +540,31 @@ footer {
 @keyframes or-drift { to { transform: translateX(-50%); } }
 .or-rv { position: relative; margin: 0; width: clamp(150px, 16vw, 210px); display: grid; gap: .6rem; cursor: pointer; outline: none; }
 .or-art { position: relative; aspect-ratio: 1; max-width: 100%; transition: transform .45s cubic-bezier(.3, 1.4, .5, 1); }
-.or-rv .or-sleeve { inset: 0; z-index: 2; }
+.or-card { position: absolute; inset: 0; z-index: 2; }
+.or-rv .or-sleeve { inset: 0; }
+/* Click a record and it turns over: the back links the song on Spotify */
+.or-back {
+  position: absolute; inset: 0; display: none; overflow: hidden; border-radius: 3px;
+  background: var(--night-2); box-shadow: 0 30px 50px -22px rgba(0, 0, 0, .6), 0 0 0 1px rgba(255, 255, 255, .12);
+}
+.or-rv.flip .or-back { display: grid; }
+.or-rv.flip .or-sleeve { visibility: hidden; }
+.or-back-bg { position: absolute; inset: -12%; width: 124%; height: 124%; max-width: none; object-fit: cover; filter: blur(16px) saturate(1.4); opacity: .6; }
+.or-back::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(10, 8, 20, .92), rgba(10, 8, 20, .45)); }
+.or-back-in { position: relative; z-index: 1; display: grid; align-content: end; gap: .2rem; padding: clamp(.6rem, 1.2vw, .9rem); min-width: 0; line-height: 1.2; }
+.or-back-k { font-family: var(--font-note); font-style: italic; font-size: var(--step--1); color: var(--sun); }
+.or-back-in b { font-size: clamp(.95rem, 1.3vw, 1.15rem); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.or-back-in > span:not(.or-back-k) { color: var(--muted); font-size: var(--step--1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.or-like {
+  margin-top: .55rem; justify-self: start; max-width: 100%;
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .5rem .8rem; border-radius: 999px;
+  background: var(--leaf); color: var(--night); font-weight: 750; font-size: .78rem; line-height: 1.1; text-decoration: none;
+  transition: transform .25s cubic-bezier(.3, 1.4, .5, 1);
+}
+.or-like:hover, .or-like:focus-visible { transform: scale(1.05); }
+.or-like:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+.or-like svg { width: 1.15em; height: 1.15em; flex: none; fill: currentColor; }
 .or-rdisc { position: absolute; inset: 3%; z-index: 1; transition: transform .7s cubic-bezier(.2, .9, .25, 1); }
 .or-rv.on { z-index: 5; }
 .or-rv.on .or-art { transform: translateY(-6px) rotate(-2deg); }
@@ -661,6 +689,13 @@ footer {
   <span class="np-pill-text"><b id="np-pill-song"></b><span id="np-pill-artist"></span></span>
 </a>
 
+<!-- Volume: rides in the header while the music section is on screen -->
+<div class="or-vol" id="or-vol" role="group" aria-label="Sound">
+  <button class="or-mute" id="or-mute" type="button" aria-pressed="false" aria-label="Turn sound on" data-cursor="Sound"><svg id="or-mute-i" viewBox="0 0 24 24" aria-hidden="true"></svg></button>
+  <input type="range" id="or-volume" min="0" max="100" step="1" value="70" aria-label="Volume">
+  <output id="or-vol-out" for="or-volume">Off</output>
+</div>
+
 <main id="top">
   <div class="hero" id="hero" data-cursor="Recolor">
     <canvas id="gl" aria-hidden="true"></canvas>
@@ -753,11 +788,6 @@ footer {
 
   <section class="section or" id="music" aria-labelledby="music-h">
     <h2 class="h2" id="music-h"><span class="line"><span>On repeat</span></span></h2>
-    <div class="or-vol" role="group" aria-label="Sound">
-      <button class="or-mute" id="or-mute" type="button" aria-pressed="false" aria-label="Turn sound on" data-cursor="Sound"><svg id="or-mute-i" viewBox="0 0 24 24" aria-hidden="true"></svg></button>
-      <input type="range" id="or-volume" min="0" max="100" step="1" value="70" aria-label="Volume">
-      <output id="or-vol-out" for="or-volume">Off</output>
-    </div>
 
     <div class="or-stage" id="or-stage">
       <canvas id="or-gl" aria-hidden="true"></canvas>
@@ -776,7 +806,7 @@ footer {
           <div class="or-prog" id="or-prog"><span id="or-cur">0:00</span><div class="or-pbar"><i id="or-bar"></i></div><span id="or-dur">0:00</span></div>
           <div class="or-ctl">
             <button class="or-btn" id="or-hear" type="button"><svg viewBox="0 0 24 24" id="or-hear-i"><path d="M7 5v14l12-7z"/></svg><span id="or-hear-t">Play preview</span></button>
-            <a class="or-btn ghost" id="or-open" href="https://open.spotify.com" target="_blank" rel="noopener">Open in Spotify</a>
+            <a class="or-btn ghost" id="or-open" href="https://open.spotify.com" target="_blank" rel="noopener" data-cursor="Spotify"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54z"/></svg>Add to your Spotify</a>
             <span class="or-swatches" title="Colors read from the cover" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
           </div>
         </div>
@@ -1320,7 +1350,7 @@ footer {
       if (s < 172800) return 'Yesterday';
       return Math.round(s / 86400) + ' days ago';
     };
-    const spotifyLink = tr => 'https://open.spotify.com/search/' + encodeURIComponent(tr.t + ' ' + tr.a);
+    const spotifyLink = tr => 'https://open.spotify.com/search/' + encodeURIComponent(tr.t.replace(/\s*[([](feat|ft|with)\.?\s[^)\]]*[)\]]/gi, '') + ' ' + tr.a);
 
     // Sample list shown until Last.fm is connected
     const SAMPLE = [
@@ -1333,21 +1363,21 @@ footer {
     ];
     const SAMPLE_HOURS = [88, 96, 71, 40, 14, 5, 2, 6, 18, 26, 31, 35, 48, 40, 37, 44, 52, 61, 66, 70, 74, 81, 84, 90];
 
-    /* Covers and 30-second previews come from the iTunes Search API (free, no key) */
+    /* Covers and 30-second previews: iTunes Search API first, Deezer when iTunes doesn't have the song (both free, no key) */
     let running = 0;
     const waiting = [];
     const queue = fn => new Promise(res => {
       const go = async () => { running++; try { res(await fn()); } finally { running--; if (waiting.length) waiting.shift()(); } };
       running < 3 ? go() : waiting.push(go);
     });
-    // JSONP, because iTunes leaves the CORS header off for pages opened straight from disk
+    // JSONP, because neither API sends a CORS header that works everywhere (iTunes drops it for pages opened from disk, Deezer never sends it)
     let jsonpN = 0;
     const jsonp = url => new Promise((res, rej) => {
-      const name = '__orItunes' + (++jsonpN), s = document.createElement('script');
+      const name = '__orJsonp' + (++jsonpN), s = document.createElement('script');
       const done = () => { clearTimeout(timer); delete window[name]; s.remove(); };
-      const timer = setTimeout(() => { done(); rej(new Error('iTunes timeout')); }, 8000);
+      const timer = setTimeout(() => { done(); rej(new Error('lookup timeout')); }, 8000);
       window[name] = j => { done(); res(j); };
-      s.onerror = () => { done(); rej(new Error('iTunes failed')); };
+      s.onerror = () => { done(); rej(new Error('lookup failed')); };
       s.src = url + '&callback=' + name;
       document.head.appendChild(s);
     });
@@ -1357,29 +1387,76 @@ footer {
       const p = base(x).replace(/[^a-z0-9*]/g, ''), q = base(t).replace(/[^a-z0-9]/g, '');
       return p.length === q.length && [...p].every((c, i) => c === '*' || c === q[i]);
     };
-    function itunes(t, a, al) {
-      const key = 'or:it2:' + norm(a + '|' + t);
+    // Skip remixes, sped-up edits and karaoke, unless the song I played is one of those
+    const odd = (t, x, album) => {
+      const want = norm(t), words = ['remix', 'sped', 'slowed', 'karaoke', 'instrumental', 'acapella', 'cover'];
+      return words.some(w => norm(x).includes(w) && !want.includes(w)) || /karaoke|tribute|instrumental|originally performed/i.test(album);
+    };
+    const pick = (list, t, ok) => list.find(x => ok(x) && sameTitle(x.title, t)) || list.find(x => ok(x) && base(x.title).startsWith(base(t)));
+    // Deezer preview links expire after about 15 minutes, so only the track id is kept and the link is fetched fresh
+    const dzLinks = {};
+    // Deezer first (its rate limit is far looser), then iTunes. If a source is down or rate-limited, the other still gets asked
+    async function fromDeezer(t, a, who) {
+      for (const term of [base(t) + ' ' + a, t + ' ' + a]) {
+        const j = await jsonp(`https://api.deezer.com/search?q=${encodeURIComponent(term)}&limit=25&output=jsonp`);
+        if (j.error) throw new Error('Deezer ' + j.error.code);
+        const r = pick(j.data || [], t, x => x.preview && norm(x.artist.name).includes(who) && !odd(t, x.title, x.album.title));
+        if (r) {
+          dzLinks[r.id] = { url: r.preview, at: Date.now() };
+          return { cover: r.album.cover_xl, dz: r.id, d: r.duration, al: r.album.title.replace(/ - (Single|EP)$/, '') };
+        }
+      }
+      return null;
+    }
+    async function fromItunes(t, a, al, who) {
+      const terms = [base(t) + ' ' + a, base(t)];
+      if (al) terms.push(base(t).split(' ')[0] + ' ' + a + ' ' + base(al));
+      for (const term of terms) {
+        const j = await jsonp(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=50`);
+        const r = pick(j.results.map(x => Object.assign(x, { title: x.trackName })), t,
+          x => x.previewUrl && norm(x.artistName).includes(who) && !odd(t, x.trackName, x.collectionName));
+        if (r) return { cover: r.artworkUrl100.replace('100x100bb', '600x600bb'), prev: r.previewUrl, d: Math.round(r.trackTimeMillis / 1000), al: r.collectionName.replace(/ - (Single|EP)$/, '') };
+      }
+      return null;
+    }
+    async function lookup(t, a, al) {
+      const who = norm(a).split(/[ ,&]/)[0];
+      let failed = false;
+      for (const source of [() => fromDeezer(t, a, who), () => fromItunes(t, a, al, who)]) {
+        try { const r = await source(); if (r) return r; } catch (e) { failed = true; }
+      }
+      // Nothing found because a source failed: don't remember it as a miss
+      if (failed) throw new Error('lookup failed');
+      return null;
+    }
+    function findSong(t, a, al) {
+      const key = 'or:it3:' + norm(a + '|' + t);
       if (lookups[key]) return lookups[key];
-      const hit = store.get(key);
-      if (hit) return (lookups[key] = Promise.resolve(hit.r));
+      // Reuse earlier iTunes finds; a miss is tried again after three days
+      const old = store.get('or:it2:' + norm(a + '|' + t)), hit = store.get(key);
+      if (hit && (hit.r || Date.now() - hit.at < 3 * 864e5)) return (lookups[key] = Promise.resolve(hit.r));
+      if (old && old.r) return (lookups[key] = Promise.resolve(old.r));
       return (lookups[key] = queue(async () => {
         try {
-          const who = norm(a).split(/[ ,&]/)[0];
-          const ok = x => x.previewUrl && norm(x.artistName).includes(who) && !/remix|version|cover|sped|slowed|karaoke|instrumental/i.test(x.trackName + ' ' + x.collectionName);
-          // Title + artist first, then the title alone, then first word + artist + album (finds censored titles)
-          const terms = [base(t) + ' ' + a, base(t)];
-          if (al) terms.push(base(t).split(' ')[0] + ' ' + a + ' ' + base(al));
-          let r;
-          for (const term of terms) {
-            const j = await jsonp(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=50`);
-            r = j.results.find(x => ok(x) && sameTitle(x.trackName, t)) || j.results.find(x => ok(x) && base(x.trackName).startsWith(base(t)));
-            if (r) break;
-          }
-          const out = r ? { cover: r.artworkUrl100.replace('100x100bb', '600x600bb'), prev: r.previewUrl, d: Math.round(r.trackTimeMillis / 1000), al: r.collectionName.replace(/ - (Single|EP)$/, '') } : null;
-          store.set(key, { r: out });
-          return out;
-        } catch (e) { return null; }
+          const r = await lookup(t, a, al);
+          store.set(key, { r, at: Date.now() });
+          return r;
+        } catch (e) { delete lookups[key]; return undefined; }
       }));
+    }
+    async function previewOf(tr) {
+      await tr.ready;
+      // The first search failed (network or rate limit): try again now that someone wants to hear it
+      if (tr.failed) { tr.failed = false; tr.ready = settle(tr); await tr.ready; }
+      if (tr.prev || !tr.dz) return tr.prev;
+      const c = dzLinks[tr.dz];
+      if (c && Date.now() - c.at < 8 * 60 * 1000) return c.url;
+      try {
+        const j = await jsonp(`https://api.deezer.com/track/${tr.dz}?output=jsonp`);
+        if (!j.preview) return null;
+        dzLinks[tr.dz] = { url: j.preview, at: Date.now() };
+        return j.preview;
+      } catch (e) { return null; }
     }
     // A paper cut-out stand-in until (or if) a real cover is found
     function standIn(tr) {
@@ -1388,14 +1465,19 @@ footer {
       return 'data:image/svg+xml,' + encodeURIComponent(svg);
     }
     function makeTrack(t, a, extra) {
-      const tr = Object.assign({ t, a, al: '', d: 210, prev: null, img: '', pal: null }, extra);
+      const tr = Object.assign({ t, a, al: '', d: 210, prev: null, dz: null, done: false, img: '', pal: null }, extra);
       tr.key = norm(a + '|' + t);
       tr.cover = tr.img || standIn(tr);
-      tr.ready = itunes(t, a, tr.al).then(r => {
-        if (r) { tr.cover = r.cover; tr.prev = r.prev; tr.d = r.d; tr.al = tr.al || r.al; }
+      tr.ready = settle(tr);
+      return tr;
+    }
+    function settle(tr) {
+      return findSong(tr.t, tr.a, tr.al).then(r => {
+        if (r) { tr.cover = r.cover; tr.prev = r.prev || null; tr.dz = r.dz || null; tr.d = r.d || tr.d; tr.al = tr.al || r.al; }
+        tr.failed = r === undefined;
+        tr.done = true;
         return tr;
       });
-      return tr;
     }
 
     /* Four colors read from the cover */
@@ -1461,16 +1543,20 @@ footer {
       const g = gainN.gain, t = actx.currentTime;
       g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(to, t + len);
     }
-    function playUrl(url) {
+    // Called from clicks and key presses so the browser lets the sound start later, even from a hover
+    function unlock() {
       if (!actx) initAudio();
       if (actx.state === 'suspended') actx.resume();
+    }
+    function playUrl(url) {
+      unlock();
       clearTimeout(swapT);
       if (curUrl === url && !player.paused) { ramp(gainFor(), .3); return; }
       ramp(0, .12);
       swapT = setTimeout(() => {
         curUrl = url;
         player.src = url;
-        player.play().then(() => ramp(gainFor(), .4)).catch(() => {});
+        player.play().then(() => ramp(gainFor(), .4)).catch(e => { if (e.name !== 'AbortError') retry(); });
       }, curUrl ? 130 : 0);
     }
     function stopAudio() {
@@ -1479,6 +1565,18 @@ footer {
       ramp(0, .25);
       swapT = setTimeout(() => { player.pause(); curUrl = null; }, 280);
     }
+    // A Deezer link that expired or failed: fetch a fresh one once
+    let wantTr = null, retried = null;
+    function retry() {
+      const tr = wantTr;
+      if (!tr || !tr.dz || retried === tr) return;
+      retried = tr;
+      delete dzLinks[tr.dz];
+      curUrl = null;
+      previewOf(tr).then(url => { if (url && wantTr === tr) playUrl(url); });
+    }
+    player.addEventListener('error', () => { if (curUrl) retry(); });
+    player.addEventListener('playing', () => { retried = null; });
     function level() {
       if (!an || player.paused) return 0;
       an.getByteTimeDomainData(buf);
@@ -1501,9 +1599,10 @@ footer {
       volOut.textContent = on ? Math.round(vol * 100) + '%' : 'Off';
       if (!hoverEl) idleSay();
     }
-    function setSound(v) { soundOn = v; if (v && vol === 0) vol = .5; drawVolume(); sync(); }
+    function setSound(v) { soundOn = v; if (v && vol === 0) vol = .5; if (v) unlock(); drawVolume(); sync(); }
     muteBtn.addEventListener('click', () => setSound(!(soundOn && vol > 0)));
     slider.addEventListener('input', () => {
+      unlock();
       vol = slider.value / 100;
       store.set('or:vol', Math.round(vol * 100));
       soundOn = vol > 0;
@@ -1522,6 +1621,30 @@ footer {
     // Mini record in the header: only for real listening, hidden while the music section is on screen
     const pill = $('np-pill'), headerClock = $('clock'), headerNav = document.querySelector('.top nav');
     let musicOnScreen = false, heroOnScreen = true;
+
+    // Volume: shown while any of the music section is on screen (or something is playing), in the header row when there's room
+    const volEl = $('or-vol'), headerMark = document.querySelector('.top .mark');
+    let musicNear = false;
+    function placeVol() {
+      const n = headerNav.firstElementChild.getBoundingClientRect(), c = headerClock.getBoundingClientRect(), m = headerMark.getBoundingClientRect();
+      const left = n.left - 20 - volEl.offsetWidth, floor = (c.width > 0 ? c.right : m.right) + 20;
+      const fits = left > floor;
+      volEl.classList.toggle('head', fits);
+      volEl.style.left = fits ? left + 'px' : '';
+      volEl.style.top = fits ? (n.top + n.height / 2 - volEl.offsetHeight / 2) + 'px' : '';
+    }
+    function updateVol() {
+      const show = musicNear || (!!curUrl && !player.paused);
+      if (show === volEl.classList.contains('show')) return;
+      volEl.classList.toggle('show', show);
+      if (show) placeVol();
+      updatePill();
+    }
+    new IntersectionObserver(([e]) => { musicNear = e.isIntersecting; updateVol(); }, { rootMargin: '0px 0px -30% 0px' }).observe($('music'));
+    addEventListener('resize', placeVol);
+    if (document.fonts) document.fonts.ready.then(placeVol);
+    player.addEventListener('pause', updateVol);
+    player.addEventListener('playing', updateVol);
     function placePill() {
       const c = headerClock.getBoundingClientRect(), n = headerNav.firstElementChild.getBoundingClientRect();
       const fits = c.width > 0 && c.right + 14 + pill.offsetWidth < n.left - 16;
@@ -1532,7 +1655,7 @@ footer {
       }
     }
     function updatePill() {
-      const tr = np.tr, show = live && np.listening && !!tr && !musicOnScreen;
+      const tr = np.tr, show = live && np.listening && !!tr && !musicOnScreen && !volEl.classList.contains('show');
       if (tr) {
         $('np-pill-art').src = tr.cover;
         $('np-pill-song').textContent = tr.t;
@@ -1554,13 +1677,23 @@ footer {
 
     function sync() {
       const tr = !soundOn || vol === 0 ? null : hoverTr ? hoverTr : (np.want && stageVisible && np.tr) ? np.tr : null;
-      tr && tr.prev ? playUrl(tr.prev) : stopAudio();
-      const previewing = !!(soundOn && vol > 0 && np.want && stageVisible && !hoverTr && np.tr && np.tr.prev);
+      wantTr = tr;
+      if (!tr) stopAudio();
+      else if (tr.prev && !tr.failed) playUrl(tr.prev);
+      // Not found yet, or a Deezer song: wait for the link, then play if it's still the one wanted
+      else previewOf(tr).then(url => {
+        if (wantTr !== tr) return;
+        url ? playUrl(url) : stopAudio();
+        if (hoverTr === tr) sayFor(tr);
+      });
+      updateVol();
+      const previewing = !!(soundOn && vol > 0 && np.want && stageVisible && !hoverTr && np.tr && (np.tr.prev || np.tr.dz || !np.tr.done));
       deck.classList.toggle('out', np.listening || previewing);
       $('or-hear-t').textContent = previewing ? 'Pause preview' : 'Play preview';
       $('or-hear-i').innerHTML = previewing ? '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>' : '<path d="M7 5v14l12-7z"/>';
     }
     $('or-hear').addEventListener('click', () => {
+      unlock();
       const previewing = soundOn && vol > 0 && np.want;
       if (previewing) np.want = false;
       else { np.want = true; if (!soundOn || vol === 0) { setSound(true); return; } }
@@ -1664,28 +1797,78 @@ footer {
     /* River of records */
     const river = $('or-river'), say = $('or-say');
     let riverKey = '';
-    const idleSay = () => { say.innerHTML = soundOn && vol > 0 ? 'Hover a record to hear it.' : `<b>Turn the sound on</b>, then ${finePointer ? 'hover' : 'tap'} a record to hear it.`; };
+    const idleSay = () => {
+      say.innerHTML = soundOn && vol > 0 ? (finePointer ? 'Hover a record to hear it. Click it to turn it over.' : 'Tap a record to hear it and turn it over.')
+        : `<b>Turn the sound on</b>, then ${finePointer ? 'hover' : 'tap'} a record to hear it.`;
+    };
+    function sayFor(tr) {
+      const name = `<b>${esc(tr.t)}</b>, ${esc(tr.a)}`;
+      say.innerHTML = !(soundOn && vol > 0) ? `${name}. Turn the sound on to hear it.`
+        : !tr.done || tr.failed ? `Finding ${name}…`
+        : tr.prev || tr.dz ? `Playing ${name}`
+        : `${name}. No preview out there for this one.`;
+    }
+    let flipEl = null, pendingRiver = null;
     function setHover(el, tr) {
       if (hoverEl === el) return;
       if (hoverEl) { hoverEl.classList.remove('on'); hoverEl.querySelector('.or-rprog i').style.width = '0'; }
       hoverEl = el;
       hoverTr = tr;
-      river.classList.toggle('hold', !!el);
+      river.classList.toggle('hold', !!(el || flipEl));
       if (el) {
         el.classList.add('on');
-        say.innerHTML = !tr.prev ? `<b>${esc(tr.t)}</b>, ${esc(tr.a)}. No preview for this one.`
-          : soundOn && vol > 0 ? `Playing <b>${esc(tr.t)}</b>, ${esc(tr.a)}`
-          : `<b>${esc(tr.t)}</b>, ${esc(tr.a)}. Turn the sound on to hear it.`;
+        sayFor(tr);
+        if (!tr.done) tr.ready.then(() => { if (hoverTr === tr) { sayFor(tr); sync(); } });
       } else idleSay();
       sync();
+      if (!el && !flipEl && pendingRiver) renderRiver(pendingRiver);
     }
+    // Turns a record over (or back) with a quick half-turn, swapping faces at the edge
+    const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54z"/></svg>';
+    function flip(fig, on) {
+      if (fig._want === on) return;
+      fig._want = on;
+      if (on && flipEl && flipEl !== fig) flip(flipEl, false);
+      if (on) flipEl = fig; else if (flipEl === fig) flipEl = null;
+      river.classList.toggle('hold', !!(hoverEl || flipEl));
+      const card = fig.querySelector('.or-card'), like = fig.querySelector('.or-like');
+      const swap = () => {
+        fig.classList.toggle('flip', fig._want);
+        fig.querySelector('.or-back').setAttribute('aria-hidden', !fig._want);
+        like.tabIndex = fig._want ? 0 : -1;
+        fig.dataset.cursor = fig._want ? 'Close' : 'Flip';
+      };
+      card.getAnimations().forEach(a => a.cancel());
+      if (reduceMotion) swap();
+      else {
+        const P = 'perspective(800px) ';
+        card.animate([{ transform: P + 'rotateY(0deg)' }, { transform: P + `rotateY(${on ? 90 : -90}deg)` }], { duration: 160, easing: 'cubic-bezier(.55, 0, 1, .45)' })
+          .onfinish = () => {
+            swap();
+            card.animate([{ transform: P + `rotateY(${on ? -90 : 90}deg)` }, { transform: P + 'rotateY(0deg)' }], { duration: 300, easing: 'cubic-bezier(.2, .9, .3, 1.25)' });
+          };
+      }
+      if (!on && !hoverEl && pendingRiver) renderRiver(pendingRiver);
+    }
+    // Tapping anywhere else turns the open record back
+    document.addEventListener('click', e => {
+      if (!flipEl || e.target.closest('.or-rv')) return;
+      const f = flipEl;
+      flip(f, false);
+      if (!finePointer && hoverEl === f) setHover(null);
+    });
     function record(tr) {
       const fig = document.createElement('figure');
       fig.className = 'or-rv';
       fig.tabIndex = 0;
-      fig.dataset.cursor = 'Listen';
-      fig.setAttribute('aria-label', `${tr.t}, ${tr.a}. Play preview`);
-      fig.innerHTML = `<div class="or-art"><div class="or-rdisc"><div class="or-spin"><div class="or-grooves"></div><div class="or-label"><img alt="" loading="lazy"></div></div><div class="or-sheen"></div></div><div class="or-sleeve"><img alt="" loading="lazy"></div></div>
+      fig.dataset.cursor = 'Flip';
+      fig._tr = tr;
+      fig._want = false;
+      fig.setAttribute('aria-label', `${tr.t}, ${tr.a}. Plays a preview. Press Enter to turn it over`);
+      fig.innerHTML = `<div class="or-art"><div class="or-rdisc"><div class="or-spin"><div class="or-grooves"></div><div class="or-label"><img alt="" loading="lazy"></div></div><div class="or-sheen"></div></div>
+        <div class="or-card"><div class="or-sleeve"><img alt="" loading="lazy"></div>
+        <div class="or-back" aria-hidden="true"><img class="or-back-bg" alt="" loading="lazy"><div class="or-back-in"><span class="or-back-k">Like it?</span><b>${esc(tr.t)}</b><span>${esc(tr.a)}</span>
+        <a class="or-like" href="${esc(spotifyLink(tr))}" target="_blank" rel="noopener" tabindex="-1" data-cursor="Spotify">${HEART}<span>Add to your Spotify</span></a></div></div></div></div>
         <figcaption><b>${esc(tr.t)}</b><span>${esc(tr.a)}</span><i>${esc(tr.when)}</i></figcaption><div class="or-rprog"><i></i></div>`;
       const imgs = fig.querySelectorAll('img');
       const paintCover = () => imgs.forEach(im => { im.src = tr.cover; });
@@ -1693,21 +1876,45 @@ footer {
       tr.ready.then(paintCover);
       let intent;
       fig.addEventListener('pointerenter', e => { if (e.pointerType !== 'mouse') return; clearTimeout(intent); intent = setTimeout(() => setHover(fig, tr), 120); });
-      fig.addEventListener('pointerleave', e => { if (e.pointerType !== 'mouse') return; clearTimeout(intent); if (hoverEl === fig) setHover(null); });
-      fig.addEventListener('click', () => {
-        if (!soundOn || vol === 0) { setHover(fig, tr); setSound(true); return; }
-        if (hoverEl === fig && !finePointer) setHover(null); else setHover(fig, tr);
+      fig.addEventListener('pointerleave', e => {
+        if (e.pointerType !== 'mouse') return;
+        clearTimeout(intent);
+        flip(fig, false);
+        if (hoverEl === fig) setHover(null);
       });
+      const toggle = () => {
+        unlock();
+        const on = !fig._want;
+        flip(fig, on);
+        if (!soundOn || vol === 0) { setHover(fig, tr); setSound(true); return; }
+        if (on) setHover(fig, tr);
+        else if (!finePointer && hoverEl === fig) setHover(null);
+      };
+      fig.addEventListener('click', e => { if (!e.target.closest('.or-like')) toggle(); });
       fig.addEventListener('focus', () => setHover(fig, tr));
-      fig.addEventListener('blur', () => { if (hoverEl === fig) setHover(null); });
-      fig.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSound(!(soundOn && vol > 0)); } });
+      fig.addEventListener('focusout', e => {
+        if (fig.contains(e.relatedTarget)) return;
+        flip(fig, false);
+        if (hoverEl === fig) setHover(null);
+      });
+      fig.addEventListener('keydown', e => {
+        if (e.target !== fig) return;
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+        if (e.key === 'Escape') flip(fig, false);
+      });
       return fig;
     }
+    // Rebuilds only when the songs change, and never under the cursor: a rebuild mid-preview cut the sound
     function renderRiver(list) {
-      const key = list.map(tr => tr.key + tr.when).join();
-      if (key === riverKey) return;
+      const key = list.map(tr => tr.key).join();
+      if (key === riverKey) {
+        pendingRiver = null;
+        river.querySelectorAll('.or-rv').forEach(f => { f.querySelector('figcaption i').textContent = f._tr.when; });
+        return;
+      }
+      if (hoverEl || flipEl) { pendingRiver = list; return; }
+      pendingRiver = null;
       riverKey = key;
-      if (hoverEl) setHover(null);
       const rows = list.length >= 10 ? [list.slice(0, Math.ceil(list.length / 2)), list.slice(Math.ceil(list.length / 2))] : [list, []];
       [$('or-row1'), $('or-row2')].forEach((row, k) => {
         row.textContent = '';
