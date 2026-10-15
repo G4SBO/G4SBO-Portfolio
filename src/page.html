@@ -244,6 +244,26 @@ body::after {
   font-weight: 600;
 }
 
+.plink { text-decoration: none; }
+.pgo {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  margin-top: .3rem;
+  padding: .65rem 1.15rem;
+  border-radius: 999px;
+  background: var(--pfg);
+  color: var(--pbg);
+  font-weight: 700;
+  transition: transform .25s ease;
+}
+.pgo svg { width: 1.15em; height: 1.15em; fill: currentColor; }
+.pgo-arrow { display: inline-block; transition: transform .25s ease; }
+.plink:hover .pgo, .plink:focus-visible .pgo { transform: translateY(-2px); }
+.plink:hover .pgo-arrow, .plink:focus-visible .pgo-arrow { transform: translate(3px, -3px); }
+.plink:focus-visible { outline-offset: -6px; border-radius: 0; }
+
 /* Sections after the run */
 .section { padding: clamp(5rem, 12vw, 9rem) var(--gutter); }
 .h2 {
@@ -709,7 +729,7 @@ footer {
     <div class="work-track" id="track">
       <div class="panel intro">
         <h2 id="work-h"><span class="line"><span>Things</span></span><span class="line"><span>I've built</span></span></h2>
-        <p>Three projects from this year. Keep scrolling.</p>
+        <p>Four projects from this year. Keep scrolling.</p>
       </div>
 
       <article class="panel project" style="--pbg: var(--leaf); --pfg: var(--night);">
@@ -725,6 +745,21 @@ footer {
           <ul class="meta"><li>Next.js</li><li>Supabase</li><li>MapLibre</li><li>2026</li></ul>
         </div>
       </article>
+
+      <a class="panel project plink" href="https://github.com/G4SBO/PatchLight" target="_blank" rel="noopener" data-cursor="GitHub" style="--pbg: var(--coral); --pfg: var(--night);">
+        <svg class="emblem-big" viewBox="-70 -70 140 140" aria-hidden="true" data-shape="dot" data-seed="7" data-color="sun"></svg>
+        <div class="pinfo">
+          <h3>PatchLight</h3>
+          <p>A free Windows 11 app that checks your pending updates against Microsoft's list of known problems and gives each one a light: green, yellow or red.</p>
+          <ul>
+            <li>Pauses the red ones before they install.</li>
+            <li>Lives in the tray and checks every hour. No account, no server.</li>
+            <li>Open source, with an installer and a command-line tool.</li>
+          </ul>
+          <ul class="meta"><li>C#</li><li>.NET</li><li>WinUI 3</li><li>2026</li></ul>
+          <span class="pgo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3"/></svg>See it on GitHub<span class="pgo-arrow" aria-hidden="true">&#8599;</span></span>
+        </div>
+      </a>
 
       <article class="panel project" style="--pbg: var(--sun); --pfg: var(--night);">
         <svg class="emblem-big" viewBox="-70 -70 140 140" aria-hidden="true" data-shape="blob" data-seed="5" data-color="coral"></svg>
