@@ -670,6 +670,46 @@ footer {
   .project .emblem-big { width: 90vw; height: 90vw; top: -6%; right: -25%; }
   .about-grid { grid-template-columns: minmax(0, 1fr); }
 }
+/* GitHub contributions: grid that tilts into a city */
+.gh { padding: 0; }
+.gh-stage {
+  position: relative; height: 100svh; min-height: 560px; overflow: hidden;
+  display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
+  padding: clamp(5rem, 9vw, 7rem) var(--gutter) clamp(1.25rem, 3vw, 2.25rem);
+}
+.gh-canvas-wrap { position: absolute; inset: 0; }
+.gh-canvas-wrap canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.gh-head, .gh-foot { position: relative; z-index: 1; pointer-events: none; }
+.gh-head a, .gh-foot a { pointer-events: auto; }
+.gh-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem 2rem; flex-wrap: wrap; }
+.gh-head .h2 { margin: 0; }
+.gh-count { margin: 0; text-align: right; }
+.gh-count b {
+  display: block; font-family: var(--font-display); font-weight: 800; font-size: var(--step-3);
+  font-variation-settings: "opsz" 96, "wdth" 75; line-height: .9; letter-spacing: -.02em; font-variant-numeric: tabular-nums;
+}
+.gh-count span { display: block; margin-top: .4rem; color: var(--muted); font-family: var(--font-note); font-style: italic; font-size: var(--step-1); }
+.gh-peak {
+  position: absolute; left: 0; top: 0; transform: translate(-50%, -100%); white-space: nowrap; pointer-events: none;
+  padding: .4rem .8rem; border-radius: 999px; background: var(--paper); color: var(--night);
+  font-size: var(--step--1); font-weight: 700; opacity: 0;
+}
+.gh-tip {
+  position: absolute; left: 0; top: 0; transform: translate(-50%, calc(-100% - 12px)); white-space: nowrap; pointer-events: none;
+  padding: .4rem .7rem; border-radius: 8px; background: var(--paper); color: var(--night);
+  font-size: var(--step--1); font-weight: 600; opacity: 0; transition: opacity .15s ease;
+}
+.gh-tip.on { opacity: 1; }
+.gh-foot { display: flex; justify-content: space-between; align-items: center; gap: 1rem 1.5rem; flex-wrap: wrap; color: var(--muted); font-size: var(--step--1); }
+.gh-foot > a { color: var(--paper); font-weight: 600; }
+.gh-legend { display: flex; align-items: center; gap: 4px; }
+.gh-legend i { width: 12px; height: 12px; border-radius: 3px; }
+.gh-legend span { margin: 0 .35rem; }
+@media (max-width: 640px) {
+  .gh-count { text-align: left; }
+  .gh-legend { display: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cd, .cd-in { transition: none; }
   .loader { display: none; }
@@ -690,6 +730,7 @@ footer {
   <span class="clock" id="clock">Vancouver</span>
   <nav aria-label="Sections">
     <a href="#work">Work</a>
+    <a href="#code">Code</a>
     <a href="#about">About</a>
     <a href="#music">Music</a>
     <a href="#links">Find me</a>
@@ -788,6 +829,25 @@ footer {
           <ul class="meta"><li>WebGL</li><li>GSAP</li><li>JavaScript</li><li>2026</li></ul>
         </div>
       </article>
+    </div>
+  </section>
+
+  <section class="gh" id="code" aria-labelledby="code-h">
+    <div class="gh-stage" id="gh-stage">
+      <div class="gh-canvas-wrap" id="gh-wrap">
+        <canvas id="gh-canvas" role="img" aria-label="GitHub contributions for the last year, one square per day, rising into a city"></canvas>
+        <div class="gh-peak" id="gh-peak"></div>
+        <div class="gh-tip" id="gh-tip"></div>
+      </div>
+      <div class="gh-head" id="gh-head">
+        <h2 class="h2" id="code-h"><span class="line"><span>Built daily</span></span></h2>
+        <p class="gh-count"><b id="gh-num">0</b><span id="gh-cap">contributions in the last year</span></p>
+      </div>
+      <div></div>
+      <div class="gh-foot" id="gh-foot">
+        <span class="gh-legend" id="gh-legend" aria-hidden="true"><span>Less</span><span>More</span></span>
+        <a href="https://github.com/G4SBO" target="_blank" rel="noopener" data-cursor="GitHub">@G4SBO on GitHub &#8599;</a>
+      </div>
     </div>
   </section>
 
@@ -2109,5 +2169,334 @@ footer {
     });
   });
 
+})();
+</script>
+
+<script>
+/* ---------- GitHub contributions: a grid that tilts into a city ---------- */
+(() => {
+  const GH_USER = 'G4SBO';
+  const CACHE_KEY = 'gh:v1';
+  // Snapshot used when the contributions API is down: [date, count] for days with commits
+  const SNAPSHOT_END = '2026-10-27';
+  const SNAPSHOT = [['07-16',1],['07-17',48],['07-18',36],['07-19',56],['07-20',20],['07-21',35],['07-22',21],['07-23',43],['07-24',41],['07-25',23],['07-26',35],['07-27',22],['07-28',5],['07-29',49],['07-31',21],['08-04',2],['08-05',29],['08-06',36],['08-07',3],['08-12',39],['08-13',1],['08-14',37],['08-15',98],['08-16',2],['08-18',22],['08-19',3],['08-20',11],['08-21',29],['08-22',48],['08-24',9],['08-25',3],['08-26',23],['08-27',6],['08-28',17],['08-29',5],['08-30',32],['08-31',4],['09-02',6],['09-03',10],['09-07',10],['09-10',3],['09-11',1],['09-12',4],['09-13',4],['09-14',2],['09-15',18],['09-16',10],['09-18',1],['09-19',1],['09-20',1],['09-22',1],['09-23',3],['09-25',4],['09-27',1],['10-02',1],['10-04',48],['10-05',13],['10-06',43],['10-07',32],['10-08',7],['10-09',8],['10-10',3],['10-11',1],['10-13',62],['10-14',73],['10-15',11],['10-16',52],['10-17',19],['10-18',68],['10-19',180],['10-20',85],['10-21',97],['10-22',173],['10-23',247],['10-24',19],['10-25',20],['10-26',25]];
+
+  const stage = document.getElementById('gh-stage');
+  if (!stage) return;
+  const wrap = document.getElementById('gh-wrap');
+  const canvas = document.getElementById('gh-canvas');
+  const ctx = canvas.getContext('2d');
+  const headEl = document.getElementById('gh-head');
+  const footEl = document.getElementById('gh-foot');
+  const numEl = document.getElementById('gh-num');
+  const capEl = document.getElementById('gh-cap');
+  const peakEl = document.getElementById('gh-peak');
+  const tipEl = document.getElementById('gh-tip');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = t => 1 - Math.pow(1 - t, 3);
+  const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const easeBack = t => t <= 0 ? 0 : 1 + 2.2 * Math.pow(t - 1, 3) + 1.2 * Math.pow(t - 1, 2);
+  const fmtDate = d => new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+  /* ---------- Colors ---------- */
+  const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const mix = (a, b, f) => a.map((v, i) => Math.round(v + (b[i] - v) * f));
+  const rgb = (c, k = 1, a = 1) => `rgba(${c.map(v => Math.min(255, Math.round(v * k))).join(',')},${a})`;
+  const NIGHT = hex(css('--night')), PAPER = hex(css('--paper'));
+  const C = name => hex(css('--' + name));
+  const EMPTY = mix(NIGHT, PAPER, .07);
+  // One color, stepped up from the night background
+  const ramp = c => [mix(NIGHT, c, .35), mix(NIGHT, c, .58), mix(NIGHT, c, .82), mix(c, PAPER, .2)];
+  const LEVELS = [EMPTY, ...ramp(C('leaf'))];
+  const legend = document.getElementById('gh-legend');
+  LEVELS.forEach(c => { const i = document.createElement('i'); i.style.background = rgb(c); legend.insertBefore(i, legend.lastElementChild); });
+
+  /* ---------- Data ---------- */
+  function fromSnapshot() {
+    const map = new Map(SNAPSHOT.map(([d, n]) => ['2026-' + d, n]));
+    const end = new Date(SNAPSHOT_END + 'T12:00:00Z');
+    const out = [];
+    for (let i = 366; i >= 0; i--) {
+      const key = new Date(end - i * 864e5).toISOString().slice(0, 10);
+      out.push({ date: key, count: map.get(key) || 0 });
+    }
+    return out;
+  }
+  async function load() {
+    try {
+      const hit = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+      if (hit && Date.now() - hit.t < 6 * 3600e3) return hit.days;
+    } catch (e) {}
+    try {
+      const r = await fetch(`https://github-contributions-api.jogruber.de/v4/${GH_USER}?y=last`);
+      if (!r.ok) throw new Error(r.status);
+      const j = await r.json();
+      const days = j.contributions.map(c => ({ date: c.date, count: c.count }));
+      if (!days.length) throw new Error('empty');
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), days })); } catch (e) {}
+      return days;
+    } catch (e) {
+      return fromSnapshot();
+    }
+  }
+
+  /* ---------- Model ---------- */
+  let cells = [], weeks = 0, maxCell = null, firstActive = 0;
+  const GAP = .2;
+  const MAX_H = 12;
+  const level = (n, max) => n === 0 ? 0 : n >= max * .5 ? 4 : n >= max * .25 ? 3 : n >= max * .1 ? 2 : 1;
+  const weekday = d => new Date(d + 'T12:00:00Z').getUTCDay();
+
+  function build(days) {
+    // Phones get the last six months so each square stays readable
+    const narrow = stage.clientWidth < 640;
+    const list = narrow ? days.slice(-(25 * 7 + weekday(days.at(-1).date) + 1)) : days;
+    capEl.textContent = narrow ? 'contributions in the last six months' : 'contributions in the last year';
+    const first = weekday(list[0].date);
+    const max = Math.max(1, ...list.map(d => d.count));
+    cells = list.map((d, i) => {
+      const k = i + first;
+      return { ...d, gx: Math.floor(k / 7), gy: k % 7, lv: level(d.count, max), h: d.count ? .4 + (MAX_H - .4) * Math.sqrt(d.count / max) : 0 };
+    });
+    weeks = cells.at(-1).gx + 1;
+    maxCell = cells.reduce((a, b) => b.count > a.count ? b : a);
+    // The camera closes in on the weeks that have commits, with a little empty street in front
+    firstActive = Math.max(0, (cells.find(c => c.count) || cells[0]).gx - 2);
+    const span = Math.max(1, weeks - firstActive);
+    cells.forEach(c => {
+      c.k = (c.gx + c.gy * .45) / (weeks + 3);                          // reveal order: sweeps left to right
+      c.j = Math.max(0, c.gx - firstActive + c.gy * .12) / (span + 1);  // rise order: oldest week first
+    });
+    peakEl.textContent = `Busiest day: ${maxCell.count} on ${fmtDate(maxCell.date)}`;
+  }
+
+  /* ---------- Drawing ---------- */
+  let W = 0, H = 0, dpr = 1, progress = reduceMotion ? 1 : 0, hover = null, drawn = [];
+  const look = { x: 0, y: 0, tx: 0, ty: 0 };   // pointer parallax, eased toward its target
+  function size() {
+    dpr = Math.min(2, devicePixelRatio || 1);
+    W = stage.clientWidth; H = stage.clientHeight;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+  }
+
+  // Scroll progress splits into: squares appear, board tilts while the camera moves in, city rises, peak label
+  const phases = p => ({
+    reveal: clamp01(p / .26),
+    tilt: easeIO(clamp01((p - .28) / .22)),
+    rise: clamp01((p - .44) / .44),
+    peak: ease(clamp01((p - .9) / .08)),
+  });
+
+  function camera(yaw, elev) {
+    const cs = Math.cos(yaw), sn = Math.sin(yaw), se = Math.sin(elev), ce = Math.cos(elev);
+    const ox = weeks / 2, oy = 3.5;
+    return {
+      cs, sn,
+      proj(x, y, z) {
+        x -= ox; y -= oy;
+        const xr = x * cs - y * sn, yr = x * sn + y * cs;
+        return [xr, yr * se - z * ce, yr];
+      },
+    };
+  }
+  const bounds = (cam, pts) => {
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    pts.forEach(([x, y, z]) => { const p = cam.proj(x, y, z); x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
+    return { x0, x1, y0, y1 };
+  };
+
+  function draw() {
+    if (!cells.length || !W) return;
+    const ph = phases(progress);
+    const LV = LEVELS;
+    const glow = LV[4];
+    const yaw = -.42 * ph.tilt, elev = Math.PI / 2 - (Math.PI / 2 - .55) * ph.tilt;
+
+    // Free band between the heading and the footer
+    const top = headEl.offsetTop + headEl.offsetHeight + 12;
+    const bot = footEl.offsetTop - 12;
+    const bandH = Math.max(120, bot - top);
+
+    // Flat: fit the whole year. City: fit only the busy weeks at full height. Blend between the two.
+    const base = camera(yaw, elev);
+    const flat = bounds(base, [[0, 0, 0], [weeks, 0, 0], [weeks, 7, 0], [0, 7, 0]]);
+    const city = bounds(base, [[firstActive, 0, 0], [weeks, 0, 0], [weeks, 7, 0], [firstActive, 7, 0],
+      ...cells.filter(c => c.count).map(c => [c.gx + .5, c.gy + .5, c.h * ph.tilt])]);
+    // The city leaves headroom for the busiest-day label
+    const room = 64 * ph.tilt;
+    const fit = b => Math.min(W * .94 / (b.x1 - b.x0), (bandH - room) * .92 / (b.y1 - b.y0));
+    const s = lerp(Math.min(fit(flat), 44), fit(city), ph.tilt);
+    const mx = lerp((flat.x0 + flat.x1) / 2, (city.x0 + city.x1) / 2, ph.tilt);
+    const my = lerp((flat.y0 + flat.y1) / 2, (city.y0 + city.y1) / 2, ph.tilt);
+    const cx = W / 2 - mx * s, cy = top + room + (bandH - room) / 2 - my * s;
+
+    // Draw with a touch of pointer parallax once the city stands up
+    const cam = camera(yaw + look.x * .16 * ph.tilt, elev - look.y * .08 * ph.tilt);
+    const { cs, sn } = cam;
+    const P = (x, y, z) => { const p = cam.proj(x, y, z); return [cx + p[0] * s, cy + p[1] * s]; };
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    // A soft pool of light under the city
+    if (ph.rise > 0) {
+      const g0 = P((firstActive + weeks) / 2, 3.5, 0);
+      const rad = (weeks - firstActive) * s * .7;
+      const g = ctx.createRadialGradient(g0[0], g0[1], 0, g0[0], g0[1], rad);
+      g.addColorStop(0, rgb(glow, 1, .22 * ease(ph.rise)));
+      g.addColorStop(1, rgb(glow, 1, 0));
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    let shown = 0;
+    const list = cells.map(c => {
+      const a = ease(clamp01((ph.reveal * 1.25 - c.k) / .25));
+      if (a > .5) shown += c.count;
+      const r = easeBack(clamp01((ph.rise * 1.3 - c.j) / .3));
+      return { c, a, z: c.h * r, d: cam.proj(c.gx + .5, c.gy + .5, 0)[2] };
+    }).filter(o => o.a > 0).sort((p, q) => p.d - q.d);
+
+    numEl.textContent = shown.toLocaleString('en-US');
+    // Round corners only while the board is flat, like the real chart
+    const radius = (1 - ph.tilt) * s * .16;
+    drawn = [];
+    list.forEach(({ c, a, z }) => {
+      const pad = GAP / 2 + (1 - a) * .4;
+      const xa = c.gx + pad, xb = c.gx + 1 - pad, ya = c.gy + pad, yb = c.gy + 1 - pad;
+      const col = LV[c.lv];
+      const foot = [[xa, ya], [xb, ya], [xb, yb], [xa, yb]];
+      const topF = foot.map(([x, y]) => P(x, y, z));
+      const faces = [topF];
+      ctx.globalAlpha = a;
+      if (z > .02) {
+        const botF = foot.map(([x, y]) => P(x, y, 0));
+        // Side normals in order: -y, +x, +y, -x. Only the ones facing the viewer get drawn.
+        [[0, -1], [1, 0], [0, 1], [-1, 0]].forEach(([nx, ny], i) => {
+          if (nx * sn + ny * cs <= .001) return;
+          const j = (i + 1) % 4;
+          faces.push([botF[i], botF[j], topF[j], topF[i]]);
+          // Sides fade darker toward the ground
+          const g = ctx.createLinearGradient(0, topF[i][1], 0, botF[i][1]);
+          g.addColorStop(0, rgb(col, nx ? .7 : .88));
+          g.addColorStop(1, rgb(col, nx ? .38 : .5));
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.moveTo(botF[i][0], botF[i][1]); ctx.lineTo(botF[j][0], botF[j][1]);
+          ctx.lineTo(topF[j][0], topF[j][1]); ctx.lineTo(topF[i][0], topF[i][1]);
+          ctx.closePath(); ctx.fill();
+        });
+      }
+      const lit = z > .02;
+      ctx.fillStyle = hover === c ? rgb(PAPER) : rgb(col, lit ? 1.15 : 1);
+      if (lit && c.lv >= 3) { ctx.shadowColor = rgb(glow, 1, .9); ctx.shadowBlur = 22 * ph.rise; }
+      ctx.beginPath();
+      if (radius > .5 && ctx.roundRect) {
+        ctx.roundRect(topF[0][0], topF[0][1], topF[2][0] - topF[0][0], topF[2][1] - topF[0][1], radius);
+      } else {
+        ctx.moveTo(topF[0][0], topF[0][1]); topF.slice(1).forEach(p => ctx.lineTo(p[0], p[1])); ctx.closePath();
+      }
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      drawn.push({ c, top: topF, faces });
+    });
+    ctx.globalAlpha = 1;
+
+    capEl.textContent = ph.tilt > .6 ? 'as a city: one building per day, as tall as its commits'
+      : stage.clientWidth < 640 ? 'contributions in the last six months' : 'contributions in the last year';
+
+    // Pin over the busiest day
+    if (ph.peak > 0 && maxCell && maxCell.count) {
+      const t = P(maxCell.gx + .5, maxCell.gy + .5, maxCell.h);
+      const lift = 40 * ph.peak;
+      ctx.strokeStyle = rgb(PAPER); ctx.fillStyle = rgb(PAPER); ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(t[0], t[1] - 4); ctx.lineTo(t[0], t[1] - 4 - lift); ctx.stroke();
+      ctx.beginPath(); ctx.arc(t[0], t[1] - 4, 3.5, 0, 7); ctx.fill();
+      const half = peakEl.offsetWidth / 2 + 8;
+      peakEl.style.opacity = ph.peak;
+      peakEl.style.left = Math.min(Math.max(t[0], half), W - half) + 'px';
+      peakEl.style.top = Math.max(t[1] - 6 - lift, top + peakEl.offsetHeight) + 'px';
+    } else {
+      peakEl.style.opacity = 0;
+    }
+  }
+
+  let queued = false;
+  const redraw = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; draw(); }); } };
+
+  // Ease the parallax toward the pointer, then stop the loop
+  let easing = false;
+  function easeLook() {
+    look.x += (look.tx - look.x) * .08; look.y += (look.ty - look.y) * .08;
+    draw();
+    if (Math.abs(look.tx - look.x) + Math.abs(look.ty - look.y) > .002) requestAnimationFrame(easeLook);
+    else easing = false;
+  }
+  function setLook(x, y) {
+    look.tx = x; look.ty = y;
+    if (!reduceMotion && !easing) { easing = true; requestAnimationFrame(easeLook); }
+  }
+
+  /* ---------- Hover: which day is under the pointer ---------- */
+  const inside = (pt, poly) => {
+    let hit = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const [xi, yi] = poly[i], [xj, yj] = poly[j];
+      if ((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) hit = !hit;
+    }
+    return hit;
+  };
+  canvas.addEventListener('pointermove', e => {
+    const r = canvas.getBoundingClientRect();
+    const pt = [e.clientX - r.left, e.clientY - r.top];
+    if (e.pointerType === 'mouse') setLook(pt[0] / r.width - .5, pt[1] / r.height - .5);
+    let found = null;
+    for (let i = drawn.length - 1; i >= 0 && !found; i--) if (drawn[i].faces.some(f => inside(pt, f))) found = drawn[i];
+    const next = found ? found.c : null;
+    if (next !== hover) { hover = next; redraw(); }
+    tipEl.classList.toggle('on', !!found);
+    if (!found) return;
+    const n = found.c.count;
+    tipEl.textContent = `${n ? n.toLocaleString('en-US') : 'No'} contribution${n === 1 ? '' : 's'} on ${fmtDate(found.c.date)}`;
+    const half = tipEl.offsetWidth / 2 + 4;
+    tipEl.style.left = Math.min(Math.max(pt[0], half), W - half) + 'px';
+    tipEl.style.top = Math.min(...found.top.map(p => p[1])) + 'px';
+  });
+  canvas.addEventListener('pointerleave', () => { hover = null; tipEl.classList.remove('on'); setLook(0, 0); redraw(); });
+
+  /* ---------- Start ---------- */
+  load().then(days => {
+    let lastNarrow = stage.clientWidth < 640;
+    size(); build(days); draw();
+    new ResizeObserver(() => {
+      const narrow = stage.clientWidth < 640;
+      size();
+      if (narrow !== lastNarrow) { lastNarrow = narrow; build(days); }
+      draw();
+    }).observe(stage);
+
+    if (reduceMotion) return;
+    if (window.gsap && window.ScrollTrigger) {
+      // Pin the stage and let scrolling drive the whole sequence
+      ScrollTrigger.create({
+        trigger: '#code', start: 'top top', end: '+=260%', pin: '#gh-stage', scrub: .6,
+        onUpdate: st => { progress = st.progress; redraw(); },
+      });
+      ScrollTrigger.refresh();
+    } else {
+      // No GSAP: play the sequence once when it comes into view
+      const io = new IntersectionObserver(([en]) => {
+        if (!en.isIntersecting) return;
+        io.disconnect();
+        const t0 = performance.now();
+        const step = now => { progress = Math.min(1, (now - t0) / 6000); draw(); if (progress < 1) requestAnimationFrame(step); };
+        requestAnimationFrame(step);
+      }, { threshold: .5 });
+      io.observe(stage);
+    }
+  });
 })();
 </script>
