@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Newsreader:ital,opsz,wght@1,6..72,400&display=swap">
 <style>
-/* Layout: full-screen liquid cut-out hero (WebGL) under giant reactive type, a skewing marquee, a pinned horizontal run of color-block project panels, then about + live status, and social cards found with a flashlight in the dark. Deliberately dark-only. */
+/* Layout: full-screen liquid cut-out hero (WebGL) under giant reactive type, a pinned horizontal run of color-block project panels, then about + live status, and social cards found with a flashlight in the dark. Deliberately dark-only. */
 :root {
   --night: #0B0718;
   --night-2: #151026;
@@ -173,34 +173,6 @@ body::after {
 .hero-foot p { margin: 0; max-width: 36ch; font-size: var(--step-1); line-height: 1.3; font-variation-settings: "opsz" 28; }
 .hero-foot .hint { font-family: var(--font-note); font-style: italic; font-size: var(--step-0); }
 
-/* Marquee */
-.marquee {
-  overflow: hidden;
-  background: var(--sun);
-  color: var(--night);
-  padding-block: 1.1rem;
-  border-block: 2px solid var(--night);
-}
-.marquee-skew { will-change: transform; }
-.marquee-inner {
-  display: flex;
-  width: max-content;
-  animation: marquee 28s linear infinite;
-}
-.marquee-inner span {
-  display: inline-flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding-right: 1.5rem;
-  font-family: var(--font-display);
-  font-size: clamp(1.75rem, 4.5vw, 3.5rem);
-  font-weight: 750;
-  font-variation-settings: "opsz" 64, "wdth" 80;
-  white-space: nowrap;
-  line-height: 1;
-}
-.marquee-inner svg { width: .8em; height: .8em; flex: none; }
-@keyframes marquee { to { transform: translateX(-50%); } }
 
 /* Work: horizontal run of panels */
 .work { position: relative; overflow: hidden; }
@@ -718,7 +690,6 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .cd, .cd-in { transition: none; }
   .loader { display: none; }
-  .marquee-inner { animation: none; }
 }
 /* Lenis smooth scroll */
 html.lenis, html.lenis body { height: auto; }
@@ -769,12 +740,6 @@ html.lenis, html.lenis body { height: auto; }
     <div class="hero-foot">
       <p>Gabriel Ronceria. I automate the boring stuff, with a little too much style.</p>
       <span class="hint" id="hint">Move around. Click to cut new colors.</span>
-    </div>
-  </div>
-
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee-skew" id="mskew">
-      <div class="marquee-inner" id="marquee"></div>
     </div>
   </div>
 
@@ -965,7 +930,7 @@ html.lenis, html.lenis body { height: auto; }
   const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   const PALETTE = ['cobalt', 'coral', 'sun', 'leaf', 'lilac', 'violet'];
 
-  /* ---------- Shape cutter (shared by emblems and marquee) ---------- */
+  /* ---------- Shape cutter (used by the emblems) ---------- */
   function mulberry32(a) {
     return () => {
       a = (a + 0x6D2B79F5) | 0;
@@ -1028,15 +993,6 @@ html.lenis, html.lenis body { height: auto; }
     },
   };
   const cut = (shape, seed, R) => SHAPES[shape](makeRng(seed), R);
-
-  /* ---------- Marquee ---------- */
-  const words = ['Automates the boring stuff', 'Hates doing things twice', 'Ships real apps', 'Too much style', 'Based in BC'];
-  const shapeTypes = ['star', 'blob', 'frond', 'dot', 'crescent'];
-  const marquee = document.getElementById('marquee');
-  const oneRun = words.map((w, i) =>
-    `<span>${w}<svg viewBox="-70 -70 140 140"><path d="${cut(shapeTypes[i], 30 + i, 62)}" fill="var(--${['cobalt', 'coral', 'violet', 'leaf', 'cobalt'][i]})"/></svg></span>`
-  ).join('');
-  marquee.innerHTML = oneRun + oneRun;
 
   /* ---------- Clock ---------- */
   const clock = document.getElementById('clock');
@@ -2161,10 +2117,6 @@ html.lenis, html.lenis body { height: auto; }
     .from('.big .ch', { yPercent: 105, duration: 1.1, ease: 'power4.out', stagger: .07 }, '-=.45')
     .from('.hero-foot > *', { opacity: 0, y: 20, duration: .8, ease: 'power3.out', stagger: .1 }, '-=.8')
     .add(() => loader.remove());
-
-  // Marquee leans with scroll speed
-  const skew = gsap.quickTo('#mskew', 'skewX', { duration: .5, ease: 'power3' });
-  ScrollTrigger.create({ onUpdate: s => skew(gsap.utils.clamp(-14, 14, s.getVelocity() / -250)) });
 
   // Section headings rise in once
   gsap.utils.toArray('.line > span').forEach(el => {
