@@ -715,6 +715,11 @@ footer {
   .loader { display: none; }
   .marquee-inner { animation: none; }
 }
+/* Lenis smooth scroll */
+html.lenis, html.lenis body { height: auto; }
+.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+.lenis [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
 </style>
 
 <div class="loader" id="loader" aria-hidden="true">
@@ -940,6 +945,7 @@ footer {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
 <script>
 (() => {
   // Put your Discord user ID here to show live status (needs joining discord.gg/lanyard once)
@@ -2129,6 +2135,15 @@ footer {
     return;
   }
   gsap.registerPlugin(ScrollTrigger);
+
+  // Smooth scroll (Lenis by darkroom.engineering), driven by the GSAP ticker so ScrollTrigger stays in sync
+  if (window.Lenis) {
+    const lenis = new Lenis({ autoRaf: false, anchors: true, lerp: .1 });
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(t => lenis.raf(t * 1000));
+    gsap.ticker.lagSmoothing(0);
+    window.lenis = lenis;
+  }
 
   // Loader: count to 100, lift the sheet, drop the letters in
   const count = document.getElementById('count');
