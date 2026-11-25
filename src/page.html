@@ -1401,7 +1401,8 @@ html.lenis, html.lenis body { height: auto; }
       const d = Math.min(devicePixelRatio || 1, 2);
       cv.width = innerWidth * d; cv.height = innerHeight * d; sctx.setTransform(d, 0, 0, d, 0, 0);
     };
-    sizeSparks(); addEventListener('resize', sizeSparks);
+    let sparksSized = false; // sized on the first click, not at load
+    addEventListener('resize', () => { sparksSized = false; });
     const drawSparks = now => {
       sctx.clearRect(0, 0, innerWidth, innerHeight);
       sparks = sparks.filter(s => now - s.t0 < 520);
@@ -1417,6 +1418,7 @@ html.lenis, html.lenis body { height: auto; }
     };
     addEventListener('pointerdown', e => {
       if (e.button > 0 || (e.target.closest && e.target.closest('#hero'))) return;
+      if (!sparksSized) { sizeSparks(); sparksSized = true; }
       let c; do { c = Math.floor(Math.random() * sparkCols.length); } while (c === lastCol); lastCol = c;
       const t0 = performance.now(), rot = Math.random() * Math.PI;
       for (let i = 0; i < 10; i++) sparks.push({ x: e.clientX, y: e.clientY, a: rot + i * Math.PI / 5, t0, col: sparkCols[c], len: 14 + Math.random() * 10 });
@@ -1516,7 +1518,9 @@ html.lenis, html.lenis body { height: auto; }
         w.style.filter = k >= 1 ? '' : `blur(${((1 - k) * 4).toFixed(2)}px)`;
       });
     };
-    addEventListener('scroll', reveal, { passive: true }); addEventListener('resize', reveal); reveal();
+    let revealQueued = false;
+    const queueReveal = () => { if (!revealQueued) { revealQueued = true; requestAnimationFrame(() => { revealQueued = false; reveal(); }); } };
+    addEventListener('scroll', queueReveal, { passive: true }); addEventListener('resize', queueReveal); queueReveal();
   })();
 
   /* ---------- Heart pop on "Add to your Spotify" ---------- */
