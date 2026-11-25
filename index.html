@@ -416,9 +416,10 @@ footer {
   width: max-content; max-width: calc(100vw - 32px);
   display: flex; align-items: center; gap: .75rem;
   padding: .3rem 1rem .3rem .3rem; border-radius: 999px;
-  background: color-mix(in srgb, var(--night-2) 88%, transparent);
-  border: 1.5px solid var(--line);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  background: linear-gradient(135deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .03) 60%), rgba(11, 7, 24, .42);
+  border: 1px solid rgba(255, 255, 255, .26);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .42), inset 0 -1px 0 rgba(255, 255, 255, .07), 0 10px 30px rgba(0, 0, 0, .3);
+  backdrop-filter: blur(16px) saturate(170%) brightness(1.08); -webkit-backdrop-filter: blur(16px) saturate(170%) brightness(1.08);
   opacity: 0; visibility: hidden; transform: translateY(-8px);
   transition: opacity .35s, transform .45s cubic-bezier(.2, .9, .25, 1), visibility 0s .45s;
 }
@@ -627,6 +628,35 @@ footer {
 .np-pill-text b, .np-pill-text span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .np-pill-text span { color: rgba(241, 238, 248, .75); }
 
+/* Elastic volume: the bar stretches past its ends and springs back */
+.or-vol input[type="range"] { transform-origin: left center; transition: height .2s; }
+.or-vol input[type="range"].drag { height: 9px; }
+.or-vol input[type="range"]::-webkit-slider-thumb { transition: transform .2s; }
+.or-vol input[type="range"].drag::-webkit-slider-thumb { transform: scale(1.25); }
+
+/* Covers that trail the cursor across the On repeat title */
+#music-h { position: relative; z-index: 2; }
+.or-trail { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.or-trail img {
+  position: absolute; width: clamp(92px, 10vw, 150px); aspect-ratio: 1; object-fit: cover; border-radius: 6px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .45);
+}
+
+/* About statement lights up word by word with the scroll */
+.statement .w { transition: opacity .2s linear, filter .2s linear; }
+
+/* Heart on the Spotify buttons beats, and pops when tapped */
+.or-rv.flip .or-like svg, #or-open svg { animation: heart-beat 1.6s ease-in-out infinite; }
+.or-like.liked svg, #or-open.liked svg { color: var(--coral); fill: var(--coral); }
+@keyframes heart-beat { 0%, 60%, 100% { transform: scale(1); } 15% { transform: scale(1.18); } 30% { transform: scale(.96); } 45% { transform: scale(1.1); } }
+.heart-fx { position: fixed; z-index: 93; pointer-events: none; border-radius: 50%; }
+@media (prefers-reduced-motion: reduce) { .or-rv.flip .or-like svg, #or-open svg { animation: none; } }
+
+/* Soft blur along the bottom edge (off over the hero, the work run and the code city) */
+.edge-blur { position: fixed; left: 0; right: 0; bottom: 0; height: 64px; z-index: 40; pointer-events: none; transition: opacity .35s; }
+.edge-blur.off { opacity: 0; }
+.edge-blur div { position: absolute; inset: 0; }
+
 /* Click sparks (everywhere but the hero) */
 .sparks { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 92; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { .np-pill-disc, .np-pill-eq i { animation: none; } }
@@ -722,6 +752,7 @@ html.lenis, html.lenis body { height: auto; }
 </div>
 
 <canvas class="sparks" id="sparks" aria-hidden="true"></canvas>
+<div class="edge-blur off" id="edge-blur" aria-hidden="true"></div>
 <div class="cursor" id="cursor" aria-hidden="true"></div>
 <div class="cursor-ring" id="ring" aria-hidden="true"><span id="ring-label"></span></div>
 
@@ -870,6 +901,7 @@ html.lenis, html.lenis body { height: auto; }
   </section>
 
   <section class="section or" id="music" aria-labelledby="music-h">
+    <div class="or-trail" id="or-trail" aria-hidden="true"></div>
     <h2 class="h2" id="music-h"><span class="line"><span>On repeat</span></span></h2>
 
     <div class="or-stage" id="or-stage">
@@ -1398,6 +1430,146 @@ html.lenis, html.lenis body { height: auto; }
       if (!sraf) sraf = requestAnimationFrame(drawSparks);
     }, { passive: true });
   }
+
+  /* ---------- Elastic volume bar ---------- */
+  (() => {
+    const bar = document.getElementById('or-volume');
+    if (!bar || reduceMotion) return;
+    let drag = false, over = 0, vel = 0, raf = 0;
+    const show = () => {
+      const w = bar.offsetWidth || 1, sx = 1 + Math.abs(over) / w;
+      bar.style.transformOrigin = over < 0 ? 'right center' : 'left center';
+      bar.style.transform = over ? `scaleX(${sx.toFixed(3)}) scaleY(${(1 / Math.sqrt(sx)).toFixed(3)})` : '';
+    };
+    const spring = () => {
+      vel = vel * .78 - over * .22; over += vel;
+      if (Math.abs(over) < .2 && Math.abs(vel) < .2) { over = 0; raf = 0; show(); return; }
+      show(); raf = requestAnimationFrame(spring);
+    };
+    const kick = o => { over = o; vel = 0; cancelAnimationFrame(raf); raf = requestAnimationFrame(spring); };
+    bar.addEventListener('pointerdown', () => { drag = true; cancelAnimationFrame(raf); bar.classList.add('drag'); });
+    addEventListener('pointermove', e => {
+      if (!drag) return;
+      const r = bar.getBoundingClientRect();
+      const beyond = e.clientX < r.left ? e.clientX - r.left : e.clientX > r.right ? e.clientX - r.right : 0;
+      over = Math.sign(beyond) * 40 * (1 - Math.exp(-Math.abs(beyond) / 100)); // harder to pull the farther you go
+      show();
+    }, { passive: true });
+    const end = () => { if (!drag) return; drag = false; bar.classList.remove('drag'); kick(over); };
+    addEventListener('pointerup', end); addEventListener('pointercancel', end);
+    bar.addEventListener('keydown', e => {
+      const d = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
+      if (d && ((d > 0 && +bar.value >= 100) || (d < 0 && +bar.value <= 0))) kick(d * 14);
+    });
+  })();
+
+  /* ---------- Covers trailing the cursor over "On repeat" ---------- */
+  (() => {
+    const head = document.getElementById('music-h'), layer = document.getElementById('or-trail');
+    if (!head || !layer || reduceMotion || !finePointer) return;
+    const section = layer.parentElement;
+    let lx = null, ly = null, i = 0;
+    const covers = () => {
+      const seen = new Set();
+      document.querySelectorAll('#music .or-sleeve img, #or-cover').forEach(im => { if (im.src) seen.add(im.src); });
+      return [...seen];
+    };
+    head.addEventListener('pointermove', e => {
+      const r = section.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+      if (lx !== null && Math.hypot(x - lx, y - ly) < 70) return;
+      const list = covers();
+      if (!list.length) return;
+      lx = x; ly = y;
+      const im = new Image();
+      im.alt = ''; im.src = list[i++ % list.length];
+      im.style.left = x + 'px'; im.style.top = y + 'px';
+      layer.appendChild(im);
+      const rot = Math.random() * 16 - 8;
+      im.animate([
+        { transform: `translate(-50%,-50%) scale(.4) rotate(${rot}deg)`, opacity: 0 },
+        { transform: `translate(-50%,-50%) scale(1) rotate(${rot}deg)`, opacity: 1, offset: .18 },
+        { transform: `translate(-50%,-50%) scale(1) rotate(${rot}deg)`, opacity: 1, offset: .55 },
+        { transform: `translate(-50%,-10%) scale(.85) rotate(${rot * 2}deg)`, opacity: 0 }
+      ], { duration: 1300, easing: 'cubic-bezier(.2,.9,.25,1)', fill: 'forwards' }).onfinish = () => im.remove();
+    }, { passive: true });
+    head.addEventListener('pointerleave', () => { lx = ly = null; });
+  })();
+
+  /* ---------- About statement lights up with the scroll ---------- */
+  (() => {
+    const st = document.querySelector('#about .statement');
+    if (!st || reduceMotion) return;
+    const words = [];
+    (function wrap(node) {
+      [...node.childNodes].forEach(n => {
+        if (n.nodeType !== 3) return wrap(n);
+        const frag = document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach(part => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) return frag.appendChild(document.createTextNode(part));
+          const w = document.createElement('span'); w.className = 'w'; w.textContent = part; words.push(w); frag.appendChild(w);
+        });
+        n.replaceWith(frag);
+      });
+    })(st);
+    const reveal = () => {
+      const r = st.getBoundingClientRect(), vh = innerHeight;
+      // 0 when the top of the statement reaches 90% of the screen, 1 when its bottom reaches 45%
+      const p = Math.max(0, Math.min(1, (vh * .9 - r.top) / (vh * .45 + r.height)));
+      const lit = p * words.length;
+      words.forEach((w, i) => {
+        const k = Math.max(0, Math.min(1, lit - i));
+        w.style.opacity = (.14 + .86 * k).toFixed(3);
+        w.style.filter = k >= 1 ? '' : `blur(${((1 - k) * 4).toFixed(2)}px)`;
+      });
+    };
+    addEventListener('scroll', reveal, { passive: true }); addEventListener('resize', reveal); reveal();
+  })();
+
+  /* ---------- Heart pop on "Add to your Spotify" ---------- */
+  document.addEventListener('click', e => {
+    const a = e.target.closest && e.target.closest('.or-like, #or-open');
+    if (!a) return;
+    a.classList.add('liked');
+    const svg = a.querySelector('svg');
+    if (!svg || reduceMotion) return;
+    svg.animate([{ transform: 'scale(1)' }, { transform: 'scale(.6)' }, { transform: 'scale(1.45)' }, { transform: 'scale(1)' }], { duration: 520, easing: 'cubic-bezier(.2,.9,.25,1)' });
+    const r = svg.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const fx = (size, css) => { const d = document.createElement('span'); d.className = 'heart-fx'; d.style.cssText = `left:${cx - size / 2}px;top:${cy - size / 2}px;width:${size}px;height:${size}px;${css}`; document.body.appendChild(d); return d; };
+    const ring = fx(r.width * 1.8, 'border:2px solid #FF4F7B;');
+    ring.animate([{ transform: 'scale(.4)', opacity: .9 }, { transform: 'scale(1.9)', opacity: 0 }], { duration: 600, easing: 'ease-out' }).onfinish = () => ring.remove();
+    const cols = ['#FF4F7B', '#FFC53D', '#B79CFF', '#22C389'];
+    for (let i = 0; i < 8; i++) {
+      const d = fx(5, `background:${cols[i % 4]};`), ang = i * Math.PI / 4 + .3, dist = 22 + Math.random() * 8;
+      d.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: `translate(${Math.cos(ang) * dist}px, ${Math.sin(ang) * dist}px) scale(.3)`, opacity: 0 }], { duration: 560, easing: 'cubic-bezier(.2,.9,.25,1)' }).onfinish = () => d.remove();
+    }
+  });
+
+  /* ---------- Soft blur on the bottom edge ---------- */
+  (() => {
+    const gb = document.getElementById('edge-blur');
+    if (!gb || !(CSS.supports('backdrop-filter', 'blur(1px)') || CSS.supports('-webkit-backdrop-filter', 'blur(1px)'))) return;
+    const N = 4;
+    for (let i = 0; i < N; i++) {
+      const d = document.createElement('div'), blur = (0.6 * Math.pow(2, i)).toFixed(2);
+      const s = (i / N) * 100, e = Math.min(100, ((i + 2) / N) * 100), m = Math.min(100, (s + e) / 2);
+      const mask = `linear-gradient(to bottom, transparent ${s}%, #000 ${m}%, #000 ${e}%)`;
+      d.style.cssText = `backdrop-filter:blur(${blur}px);-webkit-backdrop-filter:blur(${blur}px);mask-image:${mask};-webkit-mask-image:${mask};`;
+      gb.appendChild(d);
+    }
+    // Off where buttons or text sit on the bottom edge: hero, the pinned work run, the code city, and the page end
+    const skip = ['hero', 'work', 'code'].map(id => document.getElementById(id)).filter(Boolean);
+    let ticking = false;
+    const check = () => {
+      ticking = false;
+      const vh = innerHeight;
+      const off = skip.some(el => { const r = el.getBoundingClientRect(); return r.top < vh && r.bottom > vh - 64; })
+        || document.documentElement.scrollHeight - (scrollY + vh) < 4;
+      gb.classList.toggle('off', off);
+    };
+    addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(check); } }, { passive: true });
+    addEventListener('resize', check); check();
+  })();
 
   /* ---------- Copy Discord username ---------- */
   document.querySelectorAll('[data-copy]').forEach(btn => {
