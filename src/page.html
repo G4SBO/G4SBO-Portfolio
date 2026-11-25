@@ -392,6 +392,43 @@ body::after {
 .find-say { min-height: 1.6em; margin: 1.25rem 0 0; color: var(--muted); font-size: var(--step-1); }
 .find-say b { color: var(--paper); }
 
+/* Find me trial A (?findme=found): cards stay lit once found, six found lights the room */
+.find-count { display: flex; align-items: center; gap: .5rem; margin: 0 0 1rem; font-weight: 700; font-size: var(--step--1); font-variant-numeric: tabular-nums; }
+.find-count i { width: 10px; height: 10px; border-radius: 50%; background: var(--ghost); transition: background .4s, transform .4s cubic-bezier(.3, 1.4, .5, 1); }
+.find-count i.on { background: var(--c); transform: scale(1.25); }
+.find-count span { margin-left: .35rem; color: var(--muted); }
+.base .cd.found .fc.front { background: var(--c); border-color: transparent; color: var(--fg); }
+.base .cd.found .fc.front b, .base .cd.found .fc .idx { -webkit-text-stroke-color: transparent; }
+.base .cd.found .fc.front small { color: var(--fg); }
+.base .cd.found .fc .logo { fill: var(--fg); stroke: transparent; }
+.cd.pop .cd-in { animation: cd-pop .45s cubic-bezier(.3, 1.4, .5, 1); }
+@keyframes cd-pop { 50% { scale: 1.08; } }
+.table::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; transition: opacity 1.2s;
+  background: radial-gradient(circle at 20% 35%, rgba(255, 79, 123, .24), transparent 45%), radial-gradient(circle at 80% 65%, rgba(61, 91, 255, .28), transparent 45%), radial-gradient(circle at 55% 30%, rgba(255, 197, 61, .16), transparent 40%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 75%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 75%, transparent);
+}
+.table.all::after { opacity: 1; }
+.table.all .lit { opacity: 0; transition: opacity .8s; }
+.find-confetti { position: absolute; z-index: 6; width: 9px; height: 9px; border-radius: 2px; pointer-events: none; }
+.find-again { margin-left: .75rem; font: 600 var(--step--1) var(--font-body); color: var(--paper); background: none; border: 1.5px solid var(--ghost); border-radius: 999px; padding: .35rem .95rem; cursor: pointer; min-height: 36px; }
+.find-again:hover { border-color: var(--paper); }
+
+/* Find me trial B (?findme=orbit): the links orbit the G4SBO mark */
+.orbit { position: relative; height: clamp(520px, 80vh, 760px); margin-inline: calc(var(--gutter) * -1); overflow: hidden; background: radial-gradient(ellipse at 50% 50%, #1b1440, var(--night) 70%); }
+.orbit canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.orbit-mark { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 2; margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(2.8rem, 9vw, 7rem); font-variation-settings: "opsz" 96, "wdth" 75; letter-spacing: -.03em; line-height: 1; color: var(--paper); text-shadow: 0 0 30px rgba(183, 156, 255, .55); pointer-events: none; }
+.planet { position: absolute; left: 0; top: 0; z-index: 3; border: 0; padding: 0; background: none; cursor: pointer; color: var(--fg); font: inherit; text-decoration: none; }
+.planet .ball { width: var(--d, 64px); aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, .45), transparent 42%), var(--c); box-shadow: 0 0 24px color-mix(in srgb, var(--c) 60%, transparent); transition: transform .45s cubic-bezier(.3, 1.4, .5, 1); }
+.planet svg { width: 46%; height: 46%; fill: currentColor; }
+.planet .tag { position: absolute; left: 50%; top: calc(100% + 10px); transform: translateX(-50%); display: grid; justify-items: center; gap: .1rem; white-space: nowrap; padding: .4rem .85rem; border-radius: 14px; font-size: .82rem; line-height: 1.2; color: var(--paper); background: linear-gradient(135deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .03) 60%), rgba(11, 7, 24, .55); border: 1px solid rgba(255, 255, 255, .26); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); opacity: 0; transition: opacity .25s; pointer-events: none; }
+.planet .tag em { font-style: normal; color: var(--sun); font-size: .75rem; }
+.planet.hot .ball { transform: scale(1.35); }
+.planet.hot .tag { opacity: 1; }
+.planet:focus-visible { outline: none; }
+.planet:focus-visible .ball { box-shadow: 0 0 0 3px var(--sun); }
+
 footer {
   display: flex;
   flex-wrap: wrap;
@@ -1189,13 +1226,15 @@ html.lenis, html.lenis body { height: auto; }
   /* ---------- Find me: cards in the dark ---------- */
   const LOGOS = {"github": "M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12", "instagram": "M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077", "tiktok": "M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z", "spotify": "M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z", "snapchat": "M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12 1.033-.301.165-.088.344-.104.464-.104.182 0 .359.029.509.09.45.149.734.479.734.838.015.449-.39.839-1.213 1.168-.089.029-.209.075-.344.119-.45.135-1.139.36-1.333.81-.09.224-.061.524.12.868l.015.015c.06.136 1.526 3.475 4.791 4.014.255.044.435.27.42.509 0 .075-.015.149-.045.225-.24.569-1.273.988-3.146 1.271-.059.091-.12.375-.164.57-.029.179-.074.36-.134.553-.076.271-.27.405-.555.405h-.03c-.135 0-.313-.031-.538-.074-.36-.075-.765-.135-1.273-.135-.3 0-.599.015-.913.074-.6.104-1.123.464-1.723.884-.853.599-1.826 1.288-3.294 1.288-.06 0-.119-.015-.18-.015h-.149c-1.468 0-2.427-.675-3.279-1.288-.599-.42-1.107-.779-1.707-.884-.314-.045-.629-.074-.928-.074-.54 0-.958.089-1.272.149-.211.043-.391.074-.54.074-.374 0-.523-.224-.583-.42-.061-.192-.09-.389-.135-.567-.046-.181-.105-.494-.166-.57-1.918-.222-2.95-.642-3.189-1.226-.031-.063-.052-.15-.055-.225-.015-.243.165-.465.42-.509 3.264-.54 4.73-3.879 4.791-4.02l.016-.029c.18-.345.224-.645.119-.869-.195-.434-.884-.658-1.332-.809-.121-.029-.24-.074-.346-.119-1.107-.435-1.257-.93-1.197-1.273.09-.479.674-.793 1.168-.793.146 0 .27.029.383.074.42.194.789.3 1.104.3.234 0 .384-.06.465-.105l-.046-.569c-.098-1.626-.225-3.651.307-4.837C7.392 1.077 10.739.807 11.727.807l.419-.015h.06z", "discord": "M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"};
   const LINKS = [
-    { name: 'GitHub', handle: 'yo-gabriel-portfolio-here', href: 'https://github.com/yo-gabriel-portfolio-here', c: 'cobalt', fg: 'paper', key: 'G', logo: 'github' },
+    { name: 'GitHub', handle: 'G4SBO', href: 'https://github.com/G4SBO', c: 'cobalt', fg: 'paper', key: 'G', logo: 'github' },
     { name: 'Instagram', handle: '@_gasbo', href: 'https://instagram.com/_gasbo', c: 'coral', fg: 'night', key: 'I', logo: 'instagram' },
     { name: 'TikTok', handle: '@gabo2575', href: 'https://www.tiktok.com/@gabo2575', c: 'lilac', fg: 'night', key: 'T', logo: 'tiktok' },
     { name: 'Spotify', handle: 'G4SBO', href: 'https://open.spotify.com/user/wazz1majwo2c3iwky0lexag2l', c: 'leaf', fg: 'night', key: 'S', logo: 'spotify' },
     { name: 'Snapchat', handle: 'Gabriel_R', href: 'https://www.snapchat.com/add/gabriel_r97106', c: 'sun', fg: 'night', key: 'C', logo: 'snapchat' },
     { name: 'Discord', handle: 'G4SBX', copy: 'G4SBX', c: 'violet', fg: 'paper', key: 'D', logo: 'discord' },
   ];
+  // Trial versions of this section, picked with ?findme=found or ?findme=orbit (default = plain flashlight)
+  const FIND_MODE = (() => { try { return new URLSearchParams(location.search).get('findme'); } catch (e) { return null; } })();
   const table = document.getElementById('table');
   const deckBase = document.getElementById('deck-base');
   const deckLit = document.getElementById('deck-lit');
@@ -1219,6 +1258,7 @@ html.lenis, html.lenis body { height: auto; }
     light.x += (light.tx - light.x) * .16; light.y += (light.ty - light.y) * .16; light.r += (light.tr - light.r) * .12;
     const mx = (light.x * 100).toFixed(2) + '%', my = (light.y * 100).toFixed(2) + '%', rad = light.r.toFixed(1) + 'px';
     [table, deckLit].forEach(el => { el.style.setProperty('--mx', mx); el.style.setProperty('--my', my); el.style.setProperty('--rad', rad); });
+    if (FIND_MODE === 'found') checkFound(now);
   }
 
   const logoSvg = (name, cls) => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true"><path d="${LOGOS[name]}"/></svg>`;
@@ -1268,6 +1308,136 @@ html.lenis, html.lenis body { height: auto; }
     });
     pairs.push({ b, c, both });
   });
+
+  /* ---------- Trial A: find all six ---------- */
+  const found = new Set(), dwell = new Map();
+  let countEl = null;
+  function markFound(i) {
+    if (FIND_MODE !== 'found' || found.has(i)) return;
+    found.add(i);
+    const p = pairs[i];
+    p.b.classList.add('found');
+    if (!reduceMotion) { p.b.classList.add('pop'); setTimeout(() => p.b.classList.remove('pop'), 460); }
+    countEl.querySelectorAll('i')[i].classList.add('on');
+    countEl.querySelector('span').textContent = `${found.size} / ${pairs.length} found`;
+    if (found.size === pairs.length) setTimeout(lightsOn, 350);
+  }
+  function lightsOn() {
+    table.classList.add('all');
+    countEl.querySelector('span').textContent = 'You found me. All six.';
+    const again = document.createElement('button');
+    again.className = 'find-again'; again.type = 'button'; again.textContent = 'Lights off';
+    countEl.appendChild(again);
+    again.addEventListener('click', () => {
+      found.clear(); dwell.clear(); table.classList.remove('all');
+      pairs.forEach(p => p.b.classList.remove('found'));
+      countEl.querySelectorAll('i').forEach(d => d.classList.remove('on'));
+      countEl.querySelector('span').textContent = `0 / ${pairs.length} found`;
+      again.remove();
+    });
+    if (reduceMotion) return;
+    const cols = ['coral', 'sun', 'leaf', 'cobalt', 'lilac', 'violet'];
+    for (let k = 0; k < 70; k++) {
+      const d = document.createElement('span');
+      d.className = 'find-confetti'; d.style.background = `var(--${cols[k % 6]})`;
+      d.style.left = (Math.random() * 100) + '%'; d.style.top = '-12px';
+      table.appendChild(d);
+      d.animate([{ transform: 'translate(0,0) rotate(0)' }, { transform: `translate(${(Math.random() - .5) * 200}px, ${table.clientHeight + 30}px) rotate(${Math.random() * 720}deg)` }],
+        { duration: 1600 + Math.random() * 1400, delay: Math.random() * 500, easing: 'cubic-bezier(.3,.6,.5,1)', fill: 'forwards' }).onfinish = () => d.remove();
+    }
+  }
+  // A card counts as found after the light rests on it for a moment (only while the visitor moves it, not the idle wander)
+  function checkFound(now) {
+    if (table.classList.contains('all') || now - light.last > 2500) { dwell.clear(); return; }
+    const t = table.getBoundingClientRect(), lx = light.x * t.width, ly = light.y * t.height;
+    pairs.forEach((p, i) => {
+      if (found.has(i)) return;
+      const r = p.b.getBoundingClientRect(), cx = r.left - t.left + r.width / 2, cy = r.top - t.top + r.height / 2;
+      if (Math.hypot(cx - lx, cy - ly) > Math.max(r.width * .45, light.r * .45)) { dwell.delete(i); return; }
+      if (!dwell.has(i)) dwell.set(i, now);
+      else if (now - dwell.get(i) > 300) markFound(i);
+    });
+  }
+  if (FIND_MODE === 'found') {
+    countEl = document.createElement('p');
+    countEl.className = 'find-count';
+    countEl.setAttribute('aria-live', 'polite');
+    countEl.innerHTML = LINKS.map(l => `<i style="--c: var(--${l.c})"></i>`).join('') + `<span>0 / ${LINKS.length} found</span>`;
+    table.before(countEl);
+    document.getElementById('find-sub').textContent = finePointer ? 'Search the dark with your light. Find all six.' : 'Tap the cards to find all six.';
+    pairs.forEach((p, i) => p.b.addEventListener('click', () => markFound(i)));
+  }
+
+  /* ---------- Trial B: links in orbit around the mark ---------- */
+  if (FIND_MODE === 'orbit') {
+    table.hidden = true;
+    document.getElementById('find-sub').textContent = finePointer ? 'Catch a planet to stop the orbit.' : 'Tap a planet to stop it. Tap again to open.';
+    const orbit = document.createElement('div');
+    orbit.className = 'orbit';
+    orbit.innerHTML = '<canvas aria-hidden="true"></canvas><p class="orbit-mark" aria-hidden="true">G4SBO</p>';
+    table.after(orbit);
+    const cv = orbit.querySelector('canvas'), octx = cv.getContext('2d');
+    let hot = null, speed = 1, ang = 0, W = 0, H = 0, stars = [], visible = false;
+    const setHot = i => { hot = i; planets.forEach((o, k) => o.el.classList.toggle('hot', k === hot)); if (i !== null) say.innerHTML = `<b>${LINKS[i].name}</b>, ${LINKS[i].handle}.`; };
+    const planets = LINKS.map((l, i) => {
+      const el = document.createElement(l.copy ? 'button' : 'a');
+      el.className = 'planet';
+      if (l.copy) el.type = 'button'; else { el.href = l.href; el.target = '_blank'; el.rel = 'noopener'; }
+      el.dataset.cursor = l.copy ? 'Copy' : 'Open';
+      el.style.setProperty('--c', `var(--${l.c})`); el.style.setProperty('--fg', `var(--${l.fg})`);
+      el.setAttribute('aria-label', `${l.name}, ${l.handle}. ${l.copy ? 'Copy username' : 'Open'}`);
+      el.innerHTML = `<span class="ball">${logoSvg(l.logo, 'pl-logo')}</span><span class="tag"><b>${l.name}</b>${l.handle}<em>${l.copy ? 'Copy username' : 'Open &#8599;'}</em></span>`;
+      el.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') setHot(i); });
+      el.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse' && hot === i) setHot(null); });
+      el.addEventListener('focus', () => setHot(i));
+      el.addEventListener('blur', () => { if (hot === i) setHot(null); });
+      el.addEventListener('click', e => {
+        // Touch: first tap stops and shows the planet, second tap opens it
+        if (!finePointer && hot !== i) { e.preventDefault(); setHot(i); return; }
+        if (l.copy) {
+          const tag = el.querySelector('.tag em');
+          const done = msg => { tag.textContent = msg; setTimeout(() => { tag.textContent = 'Copy username'; }, 2000); };
+          if (navigator.clipboard) navigator.clipboard.writeText(l.copy).then(() => done('Copied!'), () => done(l.copy)); else done(l.copy);
+        }
+      });
+      orbit.appendChild(el);
+      return { el, off: i / LINKS.length * Math.PI * 2 };
+    });
+    document.addEventListener('click', e => { if (hot !== null && !e.target.closest('.planet')) setHot(null); });
+    const size = () => {
+      const d = Math.min(devicePixelRatio || 1, 2); W = orbit.clientWidth; H = orbit.clientHeight;
+      cv.width = W * d; cv.height = H * d; octx.setTransform(d, 0, 0, d, 0, 0);
+      stars = Array.from({ length: 120 }, () => ({ x: Math.random() * W, y: Math.random() * H, s: Math.random() * 1.3 + .2, ph: Math.random() * 6.3 }));
+      const dd = Math.max(50, Math.min(112, W * .05)); planets.forEach(o => o.el.style.setProperty('--d', dd + 'px'));
+    };
+    size(); addEventListener('resize', size);
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(orbit);
+    let last = performance.now();
+    const spin = now => {
+      requestAnimationFrame(spin);
+      const dt = Math.min(50, now - last); last = now;
+      if (!visible) return;
+      speed += ((hot === null ? 1 : 0) - speed) * .06;
+      if (!reduceMotion) ang += dt * .00026 * speed;
+      const cx = W / 2, cy = H / 2, rx = Math.min(W * .4, 760), ry = Math.min(H * .34, rx * .42), tilt = -.18;
+      octx.clearRect(0, 0, W, H);
+      octx.fillStyle = '#F1EEF8';
+      for (const st of stars) { octx.globalAlpha = .3 + .3 * Math.sin(now / 1000 + st.ph); octx.fillRect(st.x, st.y, st.s, st.s); }
+      octx.globalAlpha = 1;
+      octx.save(); octx.translate(cx, cy); octx.rotate(tilt);
+      octx.strokeStyle = 'rgba(183,156,255,.45)'; octx.lineWidth = 1.5; octx.shadowColor = '#B79CFF'; octx.shadowBlur = 12;
+      octx.beginPath(); octx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2); octx.stroke(); octx.restore();
+      planets.forEach((o, k) => {
+        const a = ang + o.off, ex = Math.cos(a) * rx, ey = Math.sin(a) * ry;
+        const x = cx + ex * Math.cos(tilt) - ey * Math.sin(tilt), y = cy + ex * Math.sin(tilt) + ey * Math.cos(tilt);
+        const depth = (Math.sin(a) + 1) / 2;
+        o.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -50%) scale(${(.72 + .38 * depth).toFixed(3)})`;
+        o.el.style.zIndex = k === hot ? 6 : depth > .5 ? 4 : 1;
+        o.el.style.opacity = (.55 + .45 * depth).toFixed(2);
+      });
+    };
+    requestAnimationFrame(spin);
+  }
 
   function layoutCards() {
     const W = table.clientWidth;
